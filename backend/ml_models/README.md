@@ -39,4 +39,4 @@ scores
 
 You should see something like this:
 
-![Alt text](app_pictures/rouge_df.png)
+![Alt text](../../app_pictures/rouge_df.png)
