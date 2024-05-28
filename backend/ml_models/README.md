@@ -20,7 +20,7 @@ We used Google Search [Google Search](https://github.com/google-research/google-
 ### Run the tests:
 
 ```
-python backend/ml_models/ml_models_test.py
+python -m unittest backend/ml_models/modules/tests/ml_models_test.py 
 ```
 
 ### How test the LLMs:
