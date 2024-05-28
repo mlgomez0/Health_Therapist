@@ -2,8 +2,13 @@ absl-py==2.1.0
 anyascii==0.3.2
 click==8.1.7
 contractions==0.1.73
+funcy==2.0
+gensim==4.3.2
+Jinja2==3.1.4
 joblib==1.4.2
+MarkupSafe==2.1.5
 nltk==3.8.1
+numexpr==2.10.0
 numpy==1.26.4
 pandas==2.2.2
 pyahocorasick==2.1.0
@@ -11,7 +16,12 @@ python-dateutil==2.9.0.post0
 pytz==2024.1
 regex==2024.5.15
 rouge-score==0.1.2
+scikit-learn==1.5.0
+scipy==1.13.1
 six==1.16.0
+smart-open==7.0.4
 textsearch==0.0.24
+threadpoolctl==3.5.0
 tqdm==4.66.4
 tzdata==2024.1
+wrapt==1.16.0
