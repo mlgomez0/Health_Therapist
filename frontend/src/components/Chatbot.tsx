@@ -17,13 +17,13 @@ const Chatbot: React.FC = () => {
         setMessages([ ...messages, newMessage ]);
         setInput('');
 
-        fetch('http://127.0.0.1:8000/api/chat', {
+        fetch('http://127.0.0.1:5000/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: input })
         }).then(response => response.json()).then(data => {
             const botMessage: IMessage = {
-                text: data.response,
+                text: data.text,
                 sender: 'bot',
             };
             setMessages(prevMessages => [ ...prevMessages, botMessage ]);

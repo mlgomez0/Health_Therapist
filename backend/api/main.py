@@ -1,6 +1,18 @@
+import os
+import sys
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './../ml_models'))
+sys.path.append(parent_dir)
+
+from first_model import ResponseGenerator
+from chat_model1 import ChatModel1
 from fastapi import FastAPI
 from src.request import Request
 from fastapi.middleware.cors import CORSMiddleware
+
+
+model = ResponseGenerator()
+#model = ChatModel1()
 
 app = FastAPI()
 
@@ -30,6 +42,7 @@ class Item():
 
 @app.post("/api/chat")
 def execute(request: Request):
+    response = model.generate_response(request.text)
     return {
-        "response": "Response from server for " + request.text
+        "text": response
     }
