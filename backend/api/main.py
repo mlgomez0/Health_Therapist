@@ -11,8 +11,8 @@ from src.request import Request
 from fastapi.middleware.cors import CORSMiddleware
 
 
-#model = ResponseGenerator()
-model = ChatModel1()
+model = ResponseGenerator()
+#model = ChatModel1()
 
 app = FastAPI()
 

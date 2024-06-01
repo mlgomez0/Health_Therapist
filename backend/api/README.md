@@ -6,7 +6,8 @@ This capstone project allow users to interact with an AI LLM model.
 
 1. Create a Python virtual environment
 ```bash
-python3.10 -m venv .venv (MacOO)
+python.exe -m venv .venv (Windows)
+python3.10 -m venv .venv (MacOS)
 ```
 
 2. Activate environment
@@ -32,8 +33,10 @@ source .venv/bin/activate (MacOS)
 
 2. Run the command
 ```bash
-uvicorn main:app --reload
+uvicorn main:app --port 5000 --reload
 ```
+
+If the latest command fails, try run the command `uvicorn main:app --port 5000`
 
 ## Use
 

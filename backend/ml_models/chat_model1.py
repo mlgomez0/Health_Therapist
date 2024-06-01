@@ -1,29 +1,22 @@
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
 class ChatModel1():
     
-    def __init__(self, model_name="distilgpt2"):
-        """
-        Initializes the ResponseGenerator class.
+    def __init__(self):
+        self.model_name = "t5-small"
+        self.max_length = 2048
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
 
-        Args:
-            model_name (str, optional): Name of the model to load. Default is "distilgpt2".
-        """
+    def generate_response(self, input_text, max_length=150, min_length=30, length_penalty=2.0, num_beams=4):
+        
+        # Prepara el texto para el modelo
+        input_ids = self.tokenizer.encode(input_text, return_tensors="pt", max_length=max_length, truncation=True)
 
-        self.model_name = "distilbert-base-uncased-distilled-squad"
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+        # Genera el resumen
+        summary_ids = self.model.generate(input_ids, max_length=self.max_length, min_length=min_length, length_penalty=length_penalty, num_beams=num_beams, early_stopping=True)
 
-    def generate_response(self, input_text):
-        context = "Transformers are very powerful models for NLP tasks."
-
-        inputs = self.tokenizer.encode_plus(input_text, context, return_tensors="pt")
-        outputs = self.model(**inputs)
-
-        start_scores = outputs.start_logits
-        end_scores = outputs.end_logits
-
-        all_tokens = self.tokenizer.convert_ids_to_tokens(inputs["input_ids"].squeeze())
-        answer = " ".join(all_tokens[torch.argmax(start_scores):torch.argmax(end_scores)+1])
-        print(answer)
+        # Decodifica y retorna el resumen
+        summary = self.tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+        return summary
