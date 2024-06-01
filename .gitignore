@@ -2,7 +2,7 @@
 venv/
 __pycache__/
 .venv
-
+.vs
 backend/api/.venv
 
 frontend/node_modules/
