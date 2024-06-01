@@ -88,3 +88,24 @@ Content-Type: application/json
 ## Common issues
 
 wsl --shutdown
+
+
+## Database Configuration
+
+### Create Database and Tables : Run the following commands to run the database
+
+    ```bash
+    python backend/api/database/setup_db.py <db_path>
+    ```
+
+### Method to create user and a conversation for testing
+
+    ```bash
+    python test_db.py <path_db> create_user <user_name>
+    ```
+
+    ```bash
+    python test_db.py <path_db> create_conversation <user_id> <Context> <Answer>
+    ```
+
+
