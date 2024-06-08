@@ -8,11 +8,13 @@ from first_model import ResponseGenerator
 from chat_model1 import ChatModel1
 from fastapi import FastAPI
 from src.request import Request
+from src.Phi3 import Phi3
 from fastapi.middleware.cors import CORSMiddleware
 
 
-model = ResponseGenerator()
+#model = ResponseGenerator()
 #model = ChatModel1()
+model = Phi3()
 
 app = FastAPI()
 
@@ -42,7 +44,7 @@ class Item():
 
 @app.post("/api/chat")
 def execute(request: Request):
-    response = model.generate_response(request.text)
+    response = model.predict(request.text)
     return {
         "text": response
     }
