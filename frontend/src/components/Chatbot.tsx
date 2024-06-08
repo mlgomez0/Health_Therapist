@@ -48,7 +48,7 @@ const Chatbot: React.FC = () => {
                         key={index}
                         className={`mb-2 p-2 rounded-lg max-w-xs ${message.sender === 'user' ? 'bg-blue-600 text-white self-end' : 'bg-gray-700 text-gray-300 self-start'}`}
                     >
-                        {message.text}
+                        {(message.text || '').split('\n').map((line, index) => <p key={index} style={{ marginBottom: 8 }}>{line}</p>)}
                     </div>
                 ))}
             </div>
