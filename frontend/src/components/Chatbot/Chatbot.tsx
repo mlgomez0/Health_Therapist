@@ -73,7 +73,9 @@ const Chatbot: React.FC = () => {
                         </>}
                         {messages.map((message, index) => (
                             <div key={index} className={`message-bubble ${message.sender}`}>
-                                {message.text}
+                                {(message.text || '').split('\n').map((line, index) => (
+                                    <div key={index}>{line}</div>
+                                ))}
                             </div>
                         ))}
                         {isLoading && <div className="message-bubble bot">Generating response...</div>}
