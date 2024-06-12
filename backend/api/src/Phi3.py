@@ -24,5 +24,5 @@ class Phi3():
 
     def predict(self, prompt: str) -> str:
         prompt = self.pipe.tokenizer.apply_chat_template([{"role": "user", "content": prompt}], tokenize=False, add_generation_prompt=True)
-        outputs = self.pipe(prompt, max_new_tokens=256, do_sample=True, num_beams=1, temperature=0.3, top_k=50, top_p=0.95, max_time= 180)
+        outputs = self.pipe(prompt, max_new_tokens=2048, do_sample=True, num_beams=1, temperature=0.3, top_k=50, top_p=0.95, max_time= 180)
         return outputs[0]['generated_text'][len(prompt):].strip()
