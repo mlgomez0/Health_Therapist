@@ -74,7 +74,9 @@ const Chatbot: React.FC = () => {
                         </>}
                         {messages.map((message, index) => (
                             <div key={index} className={`message-bubble ${message.sender}`}>
-                                {message.sender === 'user' && <div className="message-sender">You</div>}
+                                {message.sender === 'user' && <div className="message-sender">
+                                    {message.text}
+                                </div>}
                                 {message.sender === 'bot' && <MarkdownPreview
                                     source={message.text || ''} remarkPlugins={[]}
                                     wrapperElement={{
