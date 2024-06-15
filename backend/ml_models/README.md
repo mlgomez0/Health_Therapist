@@ -11,7 +11,7 @@ Rouge-1 Recall = unigram matches / unigrams in expected text
 
 Rouge-1 Precision = unigram matches / unigrams in llm response
 
-Rouge-1 Recall = 2 x (precision x recall) / (precision + recall)
+Rouge-1 fmeasure = 2 x (precision x recall) / (precision + recall)
 
 ```
 
