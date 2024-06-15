@@ -54,3 +54,15 @@
 .user-menu button:hover {
     background-color: #f1f1f1;
 }
+
+.model-selector {
+    margin-left: 10px;
+    outline: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    border: solid 1px #cccccc78;
+}
+
+.model-selector option {
+    padding: 5px 10px;
+}

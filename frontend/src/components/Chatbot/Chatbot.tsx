@@ -11,6 +11,7 @@ const Chatbot: React.FC = () => {
     const [ inputValue, setInputValue ] = useState('');
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [ isLoading, setIsLoading ] = useState(false);
+    const [ selectedModel, setSelectedModel ] = useState<'fine-tuned' | 'rag'>('fine-tuned');
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -31,7 +32,10 @@ const Chatbot: React.FC = () => {
         fetch('http://127.0.0.1:5000/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: inputValue })
+            body: JSON.stringify({
+                model: selectedModel,
+                text: inputValue
+            })
         }).then(response => response.json()).then(data => {
             const botMessage: IMessage = {
                 text: data.text,
@@ -60,6 +64,8 @@ const Chatbot: React.FC = () => {
                 onLogout={() => {
 
                 }}
+                onModelChange={(model) => setSelectedModel(model)}
+                selectedModel={selectedModel}
             />
             <div className="main-container">
                 <div className="history-container">
@@ -69,7 +75,7 @@ const Chatbot: React.FC = () => {
                     <div className="messages-container">
                         {messages.length === 0 && <>
                             <div className="welcome-message">
-                                Hello, my name is Chatbot and I'm here to help you with any questions you may have.
+                                Hello, I am a mental health chatbot. I am here to help you with any questions you may have.
                             </div>
                         </>}
                         {messages.map((message, index) => (
