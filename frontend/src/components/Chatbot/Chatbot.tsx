@@ -1,5 +1,6 @@
 'use client';
 
+import MarkdownPreview from '@uiw/react-markdown-preview';
 import React, { useEffect, useRef, useState } from 'react';
 import UserHeader from '../UserHeader/UserHeader';
 import './Chatbot.css';
@@ -73,9 +74,13 @@ const Chatbot: React.FC = () => {
                         </>}
                         {messages.map((message, index) => (
                             <div key={index} className={`message-bubble ${message.sender}`}>
-                                {(message.text || '').split('\n').map((line, index) => (
-                                    <div key={index}>{line}</div>
-                                ))}
+                                {message.sender === 'user' && <div className="message-sender">You</div>}
+                                {message.sender === 'bot' && <MarkdownPreview
+                                    source={message.text || ''} remarkPlugins={[]}
+                                    wrapperElement={{
+                                        'data-color-mode': 'light'
+                                    }}
+                                />}
                             </div>
                         ))}
                         {isLoading && <div className="message-bubble bot">Generating response...</div>}

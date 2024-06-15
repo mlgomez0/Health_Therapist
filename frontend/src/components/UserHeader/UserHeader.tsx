@@ -26,8 +26,8 @@ const UserHeader: React.FC<UserHeaderProps> = ({ onLogout, onClearAll }) => {
                 </div>
                 {menuVisible && (
                     <div className="user-menu">
-                        <button onClick={onLogout}>Cerrar sesión</button>
-                        <button onClick={onClearAll}>Limpiar todo</button>
+                        <button onClick={onLogout}>Logout</button>
+                        <button onClick={onClearAll}>Clear all messages</button>
                     </div>
                 )}
             </div>

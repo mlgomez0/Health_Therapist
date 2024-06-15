@@ -1,7 +1,10 @@
 :root {
-  --user-message-color: #007bff;
-  --bot-message-color: #28a745;
+  --user-message-color: #f9f9f9;
+  --bot-message-color: white;
+  --user-message-text-color: #000;
+  --bot-message-text-color: #000;
 }
+
 
 html, body {
   margin: 0;
@@ -38,59 +41,4 @@ html, body {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-}
-
-.messages-container {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  background-color: #fff;
-}
-
-.message-bubble {
-  max-width: 70%;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 8px;
-  color: white;
-}
-
-.message-bubble.user {
-  background-color: var(--user-message-color);
-  align-self: flex-end;
-}
-
-.message-bubble.bot {
-  background-color: var(--bot-message-color);
-  align-self: flex-start;
-}
-
-.input-container {
-  display: flex;
-  padding: 10px;
-  border-top: 1px solid #ccc;
-  background-color: #f7f7f7;
-}
-
-.input-container input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 10px;
-}
-
-.input-container button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.input-container button:hover {
-  background-color: #0056b3;
 }
