@@ -48,13 +48,23 @@ def execute(request: Request):
     # Check if the model parameter is 'fine-tuned' or 'rag' and call the respective model
     response = ""
     if request.model == "fine-tuned":
-        response = phi3.predict(request.text)
+        response = phi3.predict(request.conversation_id, request.text)
     elif request.model == "rag":
-        response = rag.predict(request.text)
+        response = rag.predict(request.conversation_id, request.text)
     else:
         response = "Invalid model parameter. Please use 'fine-tuned' or 'rag'."
 
     # Return the response
     return {
         "text": response
+    }
+
+@app.get("/api/clear")
+def clear_history():
+    """
+    Clears the conversation history of the Phi3 model
+    """
+    phi3.clear_history()
+    return {
+        "text": "Conversation history cleared"
     }

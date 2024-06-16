@@ -12,13 +12,21 @@ const Chatbot: React.FC = () => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [ isLoading, setIsLoading ] = useState(false);
     const [ selectedModel, setSelectedModel ] = useState<'fine-tuned' | 'rag'>('fine-tuned');
+    const [ conversationId, setConversationId ] = useState('')
+
+    useEffect(() => {
+        setConversationId(Date.now().toString());
+    }, [])
+
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [ messages ]);
 
     const handleSendMessage = () => {
-        if (inputValue.trim() === '') return;
+
+        if (inputValue.trim() === '')
+            return;
 
         const newMessage: IMessage = {
             text: inputValue,
@@ -34,7 +42,8 @@ const Chatbot: React.FC = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: selectedModel,
-                text: inputValue
+                text: inputValue,
+                conversation_id: conversationId
             })
         }).then(response => response.json()).then(data => {
             const botMessage: IMessage = {
@@ -60,7 +69,10 @@ const Chatbot: React.FC = () => {
     return (
         <div className="chat-wrapper">
             <UserHeader
-                onClearAll={() => setMessages([])}
+                onClearAll={() => {
+                    setMessages([]);
+                    setConversationId(Date.now().toString());
+                }}
                 onLogout={() => {
 
                 }}
