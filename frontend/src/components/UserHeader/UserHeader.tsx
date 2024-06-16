@@ -43,7 +43,7 @@ const UserHeader: React.FC<UserHeaderProps> = ({ onLogout, onClearAll, onModelCh
                 {menuVisible && (
                     <div className="user-menu">
                         <button onClick={onLogout}>Logout</button>
-                        <button onClick={onClearAll}>Clear all messages</button>
+                        <button onClick={onClearAll}>New chat</button>
                     </div>
                 )}
             </div>
