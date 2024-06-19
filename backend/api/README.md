@@ -107,5 +107,25 @@ wsl --shutdown
     ```bash
     python test_db.py <path_db> create_conversation <user_id> <Context> <Answer>
     ```
+## Setting up ChromaDB Vector Store
+
+Run the following script:
+
+    ```bash
+    python backend/api/load_vectors/load_embeddings.py
+    ```
+
+For this script to run, you have to export the following env variables:
+
+    ```bash
+    export EMBEDDING_NAME="sentence-transformers/all-MiniLM-L6-v2"
+    export DATASET_PATH="backend/ml_models/datasets/dataset.csv"
+    export PERSIST_DIRECTORY="backend/chroma_db"
+    export COLLECTION_NAME="mental_health_chats"
+    ```
+
+
+By runing the script with the above env vars, you will create a folder backend/chroma_db where the vectors DB files would be located
+
 
 
