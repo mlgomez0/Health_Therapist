@@ -34,11 +34,7 @@ class PromptTemplate:
 
 class Rag():
 
-
-
     def __init__(self) -> None:
-        pass
-
 
         print("Loading model and tokenizer...")
         # Load the model and tokenizer
@@ -158,20 +154,11 @@ class Rag():
             return similar_responses
         
         self.prompt_template = PromptTemplate(lambda query, num_examples: retrieve_responses(query, collection, k=num_examples))
-        
-
-
-
 
     def predict(self, conversation_id: str, user_input: str) -> str:
 
-
-
-
-        # Write your code here and call the RAG module
         # Create an instance of the PromptTemplate class with the retrieve_responses function
         
-
         # Test the one_shot, two_shot, and few_shot methods
         query = user_input
         one_shot_result = self.prompt_template.one_shot(query)
