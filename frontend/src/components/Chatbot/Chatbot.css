@@ -64,3 +64,24 @@
 .input-container button:hover {
     background-color: #0056b3;
 }
+
+.history-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.history-item:hover {
+    background-color: #f7f7f7;
+}
+
+.history-item-title {
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.history-item-date {
+    font-size: 10px;
+    color: #777;
+}
