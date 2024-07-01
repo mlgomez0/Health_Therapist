@@ -1,9 +1,13 @@
 'use client';
 
+import { IConversation } from '@/types/IConversation';
+import { formatDate } from '@/utils/formatDate';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 import React, { useEffect, useRef, useState } from 'react';
 import UserHeader from '../UserHeader/UserHeader';
 import './Chatbot.css';
+
+const apiUrl = 'http://127.0.0.1:5000'
 
 const Chatbot: React.FC = () => {
 
@@ -12,16 +16,21 @@ const Chatbot: React.FC = () => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [ isLoading, setIsLoading ] = useState(false);
     const [ selectedModel, setSelectedModel ] = useState<'fine-tuned' | 'rag'>('fine-tuned');
-    const [ conversationId, setConversationId ] = useState('')
-
-    useEffect(() => {
-        setConversationId(Date.now().toString());
-    }, [])
-
+    const [ conversationId, setConversationId ] = useState(0);
+    const [ history, setHistory ] = useState<IConversation[]>([]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [ messages ]);
+
+    useEffect(() => {
+        const loadConverstations = async () => {
+            const response = await fetch(`${apiUrl}/api/history`, { headers: { 'Content-Type': 'application/json' } });
+            const data = await response.json();
+            setHistory(data);
+        }
+        loadConverstations();
+    }, []);
 
     const handleSendMessage = () => {
 
@@ -37,13 +46,14 @@ const Chatbot: React.FC = () => {
         setInputValue('');
         setIsLoading(true);
 
-        fetch('http://127.0.0.1:5000/api/chat', {
+        fetch(`${apiUrl}/api/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: selectedModel,
                 text: inputValue,
-                conversation_id: conversationId
+                conversation_id: conversationId,
+                user_id: 1
             })
         }).then(response => response.json()).then(data => {
             const botMessage: IMessage = {
@@ -51,6 +61,7 @@ const Chatbot: React.FC = () => {
                 sender: 'bot',
             };
             setMessages(prevMessages => [ ...prevMessages, botMessage ]);
+            setConversationId(data.conversation_id);
         }).finally(() => {
             setIsLoading(false);
         });
@@ -71,7 +82,7 @@ const Chatbot: React.FC = () => {
             <UserHeader
                 onClearAll={() => {
                     setMessages([]);
-                    setConversationId(Date.now().toString());
+                    setConversationId(0);
                 }}
                 onLogout={() => {
 
@@ -82,6 +93,17 @@ const Chatbot: React.FC = () => {
             <div className="main-container">
                 <div className="history-container">
                     <h3>History</h3>
+                    {history.map((item, index) => <div key={index} className='history-item'>
+                        <div>
+                            <span className='history-item-title'>
+                                {item.model_name}
+                            </span>
+                            <br />
+                            <small className='history-item-date'>
+                                {formatDate(item.timestamp)}
+                            </small>
+                        </div>
+                    </div>)}
                 </div>
                 <div className="chat-container">
                     <div className="messages-container">
