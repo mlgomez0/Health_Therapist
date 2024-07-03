@@ -61,3 +61,12 @@ class ConversationRepository():
         print(messages)
 
         return conversation, messages
+
+
+    def update_score_feedback(self, conversation_id: int, user_score: int, user_feedback: str):
+    self.db.execute_nonquery('''
+        UPDATE conversations 
+        SET user_score = ?, user_feedback = ? 
+        WHERE id = ?
+    ''', (user_score, user_feedback, conversation_id))
+

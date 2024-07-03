@@ -9,6 +9,7 @@ init(autoreset=True)
 
 from fastapi import FastAPI
 from src.request import Request
+from src.domain.Feedback import Feedback
 from src.Phi3 import Phi3
 from src.Rag import Rag
 from fastapi.middleware.cors import CORSMiddleware
@@ -94,3 +95,15 @@ def get_conversations():
     user_id = 1
     result = conversation_repository.get_conversations(user_id)
     return result
+
+
+@app.patch("/api/update_feedback")
+def update_feedback(conversation_id: int, user_score: int, user_feedback: str):
+    """
+    Updates the user score and feedback for a specific conversation
+    """
+    try:
+        conversation_repository.update_score_feedback(conversation_id, user_score, user_feedback)
+        return {"message": "Feedback updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
