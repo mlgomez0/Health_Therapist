@@ -6,7 +6,6 @@ import os
 class DbContext:
 
     def __init__(self):
-
         self.db_name = 'chat_data.db'
         # If the database does not exist, create it
         if not os.path.exists(self.db_name):
@@ -16,10 +15,9 @@ class DbContext:
             print(Fore.MAGENTA + 'Database exists')
 
     def connect(self):
-        return sqlite3.connect(self.db_name,)
-    
-    def create_schema(self):
+        return sqlite3.connect(self.db_name)
 
+    def create_schema(self):
         # Create users table
         sql = '''
             CREATE TABLE IF NOT EXISTS users (
@@ -46,7 +44,7 @@ class DbContext:
         self.execute_non_query(sql, ())
         print(Fore.MAGENTA + 'Conversations table created')
 
-        # Create conversations table
+        # Create messages table
         sql = '''
             CREATE TABLE IF NOT EXISTS messages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,44 +56,29 @@ class DbContext:
             )
         '''
         self.execute_non_query(sql, ())
+        print(Fore.MAGENTA + 'Messages table created')
 
-        # Create default user if not exists
-        sql = '''
-            INSERT OR IGNORE INTO users (username, password) VALUES (?, ?);
-        '''
-        self.insert(sql, ('admin', 'admin'))
-        print(Fore.MAGENTA + 'Default user created')
-
-
-
-
-
-
-    
-    def insert(self, query: str, values: Tuple[Any, ...]) -> int:
+    def execute_non_query(self, sql: str, params: Tuple[Any]):
         with self.connect() as conn:
             cursor = conn.cursor()
-            cursor.execute(query, values)
+            cursor.execute(sql, params)
+            conn.commit()
+
+    def query_one(self, sql: str, params: Tuple[Any]):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, params)
+            return cursor.fetchone()
+
+    def query_all(self, sql: str, params: Tuple[Any]):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, params)
+            return cursor.fetchall()
+
+    def insert(self, sql: str, params: Tuple[Any]):
+        with self.connect() as conn:
+            cursor = conn.cursor()
+            cursor.execute(sql, params)
             conn.commit()
             return cursor.lastrowid
-
-    def execute_non_query(self, query: str, values: Tuple[Any, ...] = None) -> int:
-        with self.connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, values)
-            conn.commit()
-            return cursor.rowcount
-
-    def query_one(self, query: str, values: Tuple[Any, ...]) -> Tuple[Any, ...]:
-        with self.connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, values)
-            result = cursor.fetchone()
-            return result
-
-    def query_all(self, query: str, values: Tuple[Any, ...] = ()) -> List[Tuple[Any, ...]]:
-        with self.connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, values)
-            results = cursor.fetchall()
-            return results
