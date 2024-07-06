@@ -61,3 +61,27 @@ class ModelTester:
         for metric, value in self.test_results.items():
             for k, v in value.items():
                 self.test_results[metric][k] = v / self.length
+
+    def calculate_rouge_score_by_item(self):
+        """
+        Calculates the ROUGE scores for the generated texts compared to the reference texts.
+
+        This method calculates the ROUGE-1, ROUGE-2, and ROUGE-L scores for each pair of
+        test_text and gen_text, accumulating the scores for precision, recall, and f-measure.
+        It then averages the accumulated scores across all texts and stores them in `test_results`.
+
+        Returns
+        -------
+        dictionary
+        """
+        result = defaultdict(lambda: defaultdict(list))
+   
+        for test_text, gen_text in zip(self.test_texts, self.gen_texts):
+            scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
+            scores = scorer.score(test_text, gen_text)
+            for metric, score in scores.items():
+                precision, recall, fmeasure = score
+                result[metric]['precision'].append(precision)
+                result[metric]['recall'].append(recall)
+                result[metric]['fmeasure'].append(fmeasure)
+        return result
