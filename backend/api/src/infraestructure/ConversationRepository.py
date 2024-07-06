@@ -2,7 +2,7 @@ from typing import List
 from .DbContext import DbContext
 from src.domain.Conversation import Conversation
 from pydantic import TypeAdapter
-import json
+from src.domain.Message import Message
 
 class ConversationRepository():
 
@@ -45,7 +45,6 @@ class ConversationRepository():
         
         return conversations
     
-    
     def get_conversation_by_id(self, conversation_id: int):
         
         sql = '''
@@ -61,3 +60,23 @@ class ConversationRepository():
         print(messages)
 
         return conversation, messages
+    
+    def get_messages(self, conversation_id: int) -> List[Message]:
+        
+        sql = '''
+            SELECT user_message, bot_response, timestamp FROM messages WHERE conversation_id = ?
+        '''
+        rows = self.db.query_all(sql, (conversation_id,))
+        messages = []
+        for row in rows:
+            message_data = {
+                "user_input": row[0],
+                "bot_output": row[1],
+                "datetime": row[2]
+            }
+            messages.append(Message(**message_data))
+        return messages
+
+
+
+
