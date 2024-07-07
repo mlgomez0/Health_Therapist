@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@uiw/react-markdown-preview": "^5.1.1",
+    "axios": "^1.7.2",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",

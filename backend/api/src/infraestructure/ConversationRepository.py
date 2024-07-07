@@ -2,7 +2,6 @@ from typing import List
 from .DbContext import DbContext
 
 class ConversationRepository:
-
     def __init__(self, db: DbContext):
         self.db = db
 
@@ -61,16 +60,34 @@ class ConversationRepository:
     
     def get_conversation_by_id(self, conversation_id: int):
         sql = '''
-            SELECT * FROM conversations WHERE id = ?
+            SELECT id, user_id, model_name, timestamp, user_score, user_feedback
+            FROM conversations WHERE id = ?
         '''
         conversation = self.db.query_one(sql, (conversation_id,))
         
         sql = '''
-            SELECT * FROM messages WHERE conversation_id = ?
+            SELECT id, conversation_id, user_message, bot_response, timestamp
+            FROM messages WHERE conversation_id = ?
         '''
         messages = self.db.query_all(sql, (conversation_id,))
         
         return {
-            "conversation": conversation,
-            "messages": messages
+            "conversation": {
+                "id": conversation[0],
+                "user_id": conversation[1],
+                "model_name": conversation[2],
+                "timestamp": conversation[3],
+                "user_score": conversation[4],
+                "user_feedback": conversation[5]
+            },
+            "messages": [
+                {
+                    "id": message[0],
+                    "conversation_id": message[1],
+                    "user_message": message[2],
+                    "bot_response": message[3],
+                    "timestamp": message[4]
+                }
+                for message in messages
+            ]
         }

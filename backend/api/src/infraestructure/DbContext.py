@@ -4,9 +4,9 @@ from colorama import Fore, init
 import os
 
 class DbContext:
-
     def __init__(self):
-        self.db_name = 'chat_data.db'
+        # Use the correct path to your database
+        self.db_name = os.path.join(os.path.dirname(__file__), 'chat_data.db')
         # If the database does not exist, create it
         if not os.path.exists(self.db_name):
             print(Fore.RED + 'Database does not exist')
