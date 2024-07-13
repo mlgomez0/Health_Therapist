@@ -21,6 +21,19 @@ source .venv/bin/activate (MacOS)
 pip install -r requirements.txt
 ```
 
+4. Set the following Env Variables
+
+```bash
+
+HF_API_TOKEN=XXXX
+EMBEDDING_NAME=sentence-transformers/all-MiniLM-L6-v2
+DATASET_PATH=backend/ml_models/datasets/dataset.csv
+PERSIST_DIRECTORY=backend/api/chroma_db
+CHROMA_DB_DIR=chroma_db
+COLLECTION_NAME=mental_health_chats
+PHI3_MODEL_NAME=microsoft/Phi-3-mini-4k-instruct
+```
+
 ## Run service
 
 To run the serive, follow the next steps:
@@ -120,7 +133,7 @@ For this script to run, you have to export the following env variables:
     ```bash
     export EMBEDDING_NAME="sentence-transformers/all-MiniLM-L6-v2"
     export DATASET_PATH="backend/ml_models/datasets/dataset.csv"
-    export PERSIST_DIRECTORY="backend/chroma_db"
+    export PERSIST_DIRECTORY="backend/api/chroma_db"
     export COLLECTION_NAME="mental_health_chats"
     ```
 

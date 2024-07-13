@@ -1,11 +1,5 @@
 import os
-from dotenv import load_dotenv
-from langchain import LLMChain
 from langchain.llms import HuggingFaceHub
-from langchain.prompts import PromptTemplate
-
-# Load environment variables from .env file
-load_dotenv()
 
 class LlmTalker:
     """
@@ -26,35 +20,22 @@ class LlmTalker:
         self.model_name = model_name
         self.hf_api_token = os.getenv("HF_API_TOKEN")
 
-    def start_chat(self, inputs, template):
+    def start_chat(self, prompt):
         """
         Starts a chat with the language model using the provided inputs and template.
         
         Args:
-            inputs (dict): A dictionary containing the input variables for the prompt.
-            template (str): The template string for the prompt.
+            prompt (str): The complete prompt to.
         
         Returns:
             str: The response from the language model.
         """
-        # Create the prompt template
-        prompt = PromptTemplate(
-            input_variables=inputs.keys(),
-            template=template
-        )
-        
-        # Create the LLM instance
+
         llm = HuggingFaceHub(
             repo_id=self.model_name, 
             model_kwargs={"temperature": 1, "max_length": 1000}, 
             huggingfacehub_api_token=self.hf_api_token
         )
-
-        # Create the chain
-        chain = LLMChain(llm=llm, prompt=prompt)
-
-        # Run the chain with the inputs
-        response = chain.run(inputs)
-        response = response.replace("\n", "")
-        return response
+    
+        return llm(prompt)
 
