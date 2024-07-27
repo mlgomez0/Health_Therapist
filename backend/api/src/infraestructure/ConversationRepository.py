@@ -71,7 +71,7 @@ class ConversationRepository:
         sql = '''
             SELECT * FROM messages WHERE conversation_id = ?
         '''
-        messages = self.db.query_all(sql, (conversation_id,)
+        messages = self.db.query_all(sql, (conversation_id,))
 
         return conversation, messages
     

@@ -20,7 +20,8 @@ from src.infraestructure.UserRepository import UserRepository
 
 # Create an instance of the Phi3 and Rag classes
 phi3 = Phi3()
-rag = Rag()
+phi_model_name = os.getenv("PHI3_MODEL_NAME")
+rag = Rag(phi_model_name)
 
 # Create an instance of the FastAPI class
 app = FastAPI()

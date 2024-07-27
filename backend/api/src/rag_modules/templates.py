@@ -108,9 +108,27 @@ class PromptTemplate:
         str
             The final formatted prompt ready for use.
         """
-        formatted_examples = "\n<|system|>\nYou are a mental health therapist<|end|>\n" + "\n".join(
+        formatted_examples = "\n<|system|>\nYou are a mental health therapist. Please provide a thoughtful and supportive response to the following text<|end|>\n" + "\n".join(
             [f"<|user|>\n{ex['Context']}<|end|>\n<|assistant|>\n{ex['Response']}<|end|>\n" for ex in examples]
         )
         final_query = formatted_examples + f"<|user|>\n{query}<|end|>\n<|assistant|>\n"
         return final_query
+    
+    def zero_shot(self, query):
+        """
+        Generates a one-shot prompt based on the provided query.
+
+        Parameters:
+        -----------
+        query : str
+            The input query for which a one-shot prompt is to be generated.
+
+        Returns:
+        --------
+        str
+            The formatted one-shot prompt.
+        """
+        
+        return self._format_prompt(query, [])
+    
 
