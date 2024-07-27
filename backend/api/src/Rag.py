@@ -12,6 +12,8 @@ class Rag:
     predict(conversation_id: str, user_input: str) -> str:
         Generates a prediction/response based on the user input and context.
     """
+    def __init__(self, model_name):
+        self.llm_talker = LlmTalker(model_name)
 
     def predict(self, conversation_id: str, user_input: str) -> str:
         """
@@ -38,17 +40,19 @@ class Rag:
         phi_model_name = os.getenv("PHI3_MODEL_NAME")
         if not phi_model_name:
             raise KeyError("PHI3_MODEL_NAME environment variable is not set")
-
+        
         # Prepare the query and context prompt
         query = user_input
-        prompt_context = PromptTemplate().two_shot(query)
+        prompt_context = PromptTemplate().zero_shot(query)
 
         # Initialize the LLM talker with the specified model
-        llm_talker = LlmTalker(phi_model_name)
+        #llm_talker = LlmTalker(phi_model_name)
 
         # Generate the response with context
-        answer_with_context = llm_talker.start_chat(prompt_context)
+        #answer_with_context = llm_talker.start_chat(prompt_context)
+        answer_with_context = self.llm_talker.start_chat_with_history(prompt_context)
 
         # Extract and return the final answer
         answer = answer_with_context.split('<|assistant|>')[-1]
+        
         return answer

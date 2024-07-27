@@ -1,5 +1,8 @@
 import os
 from langchain.llms import HuggingFaceHub
+from langchain.chains import ConversationChain
+from langchain.memory import ConversationBufferMemory
+from langchain_core.prompts import PromptTemplate
 
 class LlmTalker:
     """
@@ -19,6 +22,30 @@ class LlmTalker:
         """
         self.model_name = model_name
         self.hf_api_token = os.getenv("HF_API_TOKEN")
+        self.memory = ConversationBufferMemory(memory_key="chat_history")
+        template = """<|system|>
+                        You are a mental health therapist. Please provide a thoughtful and supportive response to the following user question, use the following history of the conversation as context
+                        {chat_history}<|end|>
+                        <|user|>
+                        {input}<|end|>
+                        <|assistant|>"""
+
+        self.prompt = PromptTemplate(
+            input_variables=["chat_history", "input"], template=template
+        )
+
+        self.model = HuggingFaceHub(
+            repo_id=self.model_name, 
+            model_kwargs={"temperature": 0.7, "max_length": 4000},
+            huggingfacehub_api_token=self.hf_api_token
+        )
+        
+        self.llm_chain = ConversationChain(
+            llm=self.model,
+            prompt=self.prompt,
+            verbose=True,
+            memory=self.memory
+        )
 
     def start_chat(self, prompt):
         """
@@ -33,9 +60,13 @@ class LlmTalker:
 
         llm = HuggingFaceHub(
             repo_id=self.model_name, 
-            model_kwargs={"temperature": 1, "max_length": 1000}, 
+            model_kwargs={"temperature": 0.7, "max_length": 4000}, 
             huggingfacehub_api_token=self.hf_api_token
         )
     
         return llm(prompt)
+    
+    def start_chat_with_history(self, query):
+    
+        return self.llm_chain.predict(input=query)
 
