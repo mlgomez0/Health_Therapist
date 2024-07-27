@@ -43,14 +43,14 @@ class Rag:
         
         # Prepare the query and context prompt
         query = user_input
-        prompt_context = PromptTemplate().zero_shot(query)
+        #prompt_context = PromptTemplate().one_shot(query)
 
         # Initialize the LLM talker with the specified model
         #llm_talker = LlmTalker(phi_model_name)
 
         # Generate the response with context
         #answer_with_context = llm_talker.start_chat(prompt_context)
-        answer_with_context = self.llm_talker.start_chat_with_history(prompt_context)
+        answer_with_context = self.llm_talker.start_chat_with_history(query)
 
         # Extract and return the final answer
         answer = answer_with_context.split('<|assistant|>')[-1]

@@ -108,7 +108,7 @@ class PromptTemplate:
         str
             The final formatted prompt ready for use.
         """
-        formatted_examples = "\n<|system|>\nYou are a mental health therapist. Please provide a thoughtful and supportive response to the following text without including the text in your response, your response should have at least 10000 words<|end|>\n" + "\n".join(
+        formatted_examples = "\n<|system|>\nYou are a mental health therapist. Please provide a thoughtful and supportive response to the following text<|end|>\n" + "\n".join(
             [f"<|user|>\n{ex['Context']}<|end|>\n<|assistant|>\n{ex['Response']}<|end|>\n" for ex in examples]
         )
         final_query = formatted_examples + f"<|user|>\n{query}<|end|>\n<|assistant|>\n"
