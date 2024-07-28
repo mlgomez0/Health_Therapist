@@ -19,11 +19,32 @@ sys.path.append(parent_dir)
 
 init(autoreset=True)
 
+from fastapi import FastAPI,HTTPException
+from src.request import Request
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from src.Phi3 import Phi3
+from src.Rag import Rag
+from fastapi.middleware.cors import CORSMiddleware
+from src.infraestructure.ConversationRepository import ConversationRepository
+from src.infraestructure.DbContext import DbContext
+from src.infraestructure.UserRepository import UserRepository
+
+# Create an instance of the Phi3 and Rag classes
+phi3 = Phi3()
+phi_model_name = os.getenv("PHI3_MODEL_NAME")
+rag = Rag(phi_model_name)
+
+# Create an instance of the FastAPI class
 app = FastAPI()
 
 origins = [
     "http://localhost:3000",  # React frontend
 ]
+# Create an instance of the ConversationRepository class
+conversation_repository = ConversationRepository(DbContext())
+user_repository = UserRepository(DbContext())
+print(Fore.MAGENTA + "Database connected")
 
 app.add_middleware(
     CORSMiddleware,
@@ -142,3 +163,42 @@ def get_conversation(conversation_id: int):
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run(app, host='127.0.0.1', port=5000)
+
+@app.get("/api/history")
+def get_conversations():
+    """
+    Returns the conversations history
+    """
+    user_id = 1
+    result = conversation_repository.get_conversations(user_id)
+    return result
+
+# User management API models and endpoints
+class User(BaseModel):
+    username: str
+    password: str
+
+@app.post("/users/")
+def create_user(user: User):
+    user_id = user_repository.insert_user(user.username, user.password)
+    if user_id:
+        return {"id": user_id, "username": user.username}
+    else:
+        raise HTTPException(status_code=400, detail="User creation failed")
+
+@app.put("/users/{user_id}")
+def update_user(user_id: int, user: User):
+    rows_affected = user_repository.update_user(user_id, user.username, user.password)
+    if rows_affected:
+        return {"message": "User updated successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+
+@app.delete("/users/{user_id}")
+def delete_user(user_id: int):
+    rows_affected = user_repository.delete_user(user_id)
+    if rows_affected:
+        return {"message": "User deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+
