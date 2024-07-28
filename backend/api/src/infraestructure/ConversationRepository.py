@@ -17,28 +17,17 @@ class ConversationRepository:
         '''
         return self.db.insert(sql, (conversation_id, user_message, bot_response))
 
-    def update_conversation(self, conversation_id: int, new_user_score: int = None, new_user_feedback: str = None):
-        if new_user_score is not None:
-            sql = '''
-                UPDATE conversations
-                SET user_score = ?, timestamp = CURRENT_TIMESTAMP
-                WHERE id = ?
-            '''
-            self.db.execute_non_query(sql, (new_user_score, conversation_id))
-        
-        if new_user_feedback:
-            sql = '''
-                UPDATE conversations
-                SET user_feedback = ?, timestamp = CURRENT_TIMESTAMP
-                WHERE id = ?
-            '''
-            self.db.execute_non_query(sql, (new_user_feedback, conversation_id))
-
-        return f"Updated Conversation ID: {conversation_id}"
+    def update_summary(self, conversation_id: int, summary: str):
+        sql = '''
+            UPDATE conversations
+            SET summary = ?
+            WHERE id = ?
+        '''
+        self.db.execute_non_query(sql, (summary, conversation_id))
 
     def get_conversations(self, user_id: int) -> List[dict]:
         sql = '''
-            SELECT id, user_id, model_name, timestamp, user_score, user_feedback
+            SELECT id, user_id, model_name, summary, timestamp
             FROM conversations
             WHERE user_id = ?
         '''
@@ -50,9 +39,8 @@ class ConversationRepository:
                 "id": row[0],
                 "user_id": row[1],
                 "model_name": row[2],
-                "timestamp": row[3],
-                "user_score": row[4],
-                "user_feedback": row[5]
+                "summary": row[3],
+                "timestamp": row[4]
             }
             conversations.append(conversation_data)
         
@@ -60,7 +48,7 @@ class ConversationRepository:
     
     def get_conversation_by_id(self, conversation_id: int):
         sql = '''
-            SELECT id, user_id, model_name, timestamp, user_score, user_feedback
+            SELECT id, user_id, model_name, summary, timestamp
             FROM conversations WHERE id = ?
         '''
         conversation = self.db.query_one(sql, (conversation_id,))
@@ -76,9 +64,8 @@ class ConversationRepository:
                 "id": conversation[0],
                 "user_id": conversation[1],
                 "model_name": conversation[2],
-                "timestamp": conversation[3],
-                "user_score": conversation[4],
-                "user_feedback": conversation[5]
+                "summary": conversation[3],
+                "timestamp": conversation[4]
             },
             "messages": [
                 {

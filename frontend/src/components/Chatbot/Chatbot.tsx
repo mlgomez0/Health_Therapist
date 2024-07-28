@@ -1,11 +1,14 @@
 'use client';
 
 import { IConversation } from '@/types/IConversation';
+import { IMessage } from '@/types/IMessage';
 import { formatDate } from '@/utils/formatDate';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 import React, { useEffect, useRef, useState } from 'react';
-import UserHeader from '../UserHeader/UserHeader';
+import { Menu, MenuItem, MenuButton } from '@szhsin/react-menu';
+import '@szhsin/react-menu/dist/index.css';
 import './Chatbot.css';
+import { useRouter } from 'next/navigation';
 
 const apiUrl = 'http://127.0.0.1:5000'; // Ensure this matches FastAPI URL
 
@@ -17,6 +20,8 @@ const Chatbot: React.FC = () => {
     const [selectedModel, setSelectedModel] = useState<'fine-tuned' | 'rag'>('fine-tuned');
     const [conversationId, setConversationId] = useState(0);
     const [history, setHistory] = useState<IConversation[]>([]);
+    const username = "aiswarya_prabhalan"; // Replace with actual username from context or props
+    const router = useRouter(); // For navigation
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -25,13 +30,11 @@ const Chatbot: React.FC = () => {
     useEffect(() => {
         const loadConversations = async () => {
             try {
-                console.log("Fetching conversation history...");
                 const response = await fetch(`${apiUrl}/api/history`, { headers: { 'Content-Type': 'application/json' } });
                 if (!response.ok) {
                     throw new Error(`Error fetching history: ${response.statusText}`);
                 }
                 const data = await response.json();
-                console.log("Conversation history fetched:", data);
                 setHistory(data);
             } catch (error) {
                 console.error("Error fetching history:", error);
@@ -42,21 +45,18 @@ const Chatbot: React.FC = () => {
 
     const fetchConversationDetails = async (conversationId: number) => {
         try {
-            console.log(`Fetching details for conversation ID: ${conversationId}`);
             const response = await fetch(`${apiUrl}/api/conversation/${conversationId}`, { headers: { 'Content-Type': 'application/json' } });
             if (!response.ok) {
                 throw new Error(`Error fetching conversation details: ${response.statusText}`);
             }
             const data = await response.json();
-            console.log("Conversation details fetched:", data);
             
-            const xxxxxx: IMessage[] = [];
+            const newMessages: IMessage[] = [];
             data.messages.forEach((x: any) => {
-
-                xxxxxx.push({ text: x.user_message, sender: 'user'})
-                xxxxxx.push({ text: x.bot_response, sender: 'bot'})
-            })
-            setMessages(xxxxxx);
+                newMessages.push({ text: x.user_message, sender: 'user' });
+                newMessages.push({ text: x.bot_response, sender: 'bot' });
+            });
+            setMessages(newMessages);
             setConversationId(conversationId);
         } catch (error) {
             console.error("Error fetching conversation details:", error);
@@ -117,19 +117,36 @@ const Chatbot: React.FC = () => {
         }
     };
 
+    const handleLogout = () => {
+        // Clear any stored user data here if needed
+        router.push('/login'); // Navigate to the login page
+    };
+
+    const handleNewChat = () => {
+        setMessages([]);
+        setConversationId(0);
+    };
+
     return (
         <div className="chat-wrapper">
-            <UserHeader
-                onClearAll={() => {
-                    setMessages([]);
-                    setConversationId(0);
-                }}
-                onLogout={() => {
-                    // Implement logout functionality
-                }}
-                onModelChange={(model) => setSelectedModel(model)}
-                selectedModel={selectedModel}
-            />
+            <div className="header">
+                <img src="/logo_2.png" alt="Mind2Heart Logo" className="logo" />
+                <select
+                    value={selectedModel}
+                    onChange={(e) => setSelectedModel(e.target.value as 'fine-tuned' | 'rag')}
+                    className="model-select"
+                >
+                    <option value="fine-tuned">Fine-tuned</option>
+                    <option value="rag">Rag</option>
+                </select>
+                <div className="header-right">
+                    <span className="username">{username}</span>
+                    <Menu menuButton={<MenuButton className="user-button"><img src="/images/user-icon.png" alt="User Icon" className="user-icon" /></MenuButton>}>
+                        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                        <MenuItem onClick={handleNewChat}>New chat</MenuItem>
+                    </Menu>
+                </div>
+            </div>
             <div className="main-container">
                 <div className="history-container">
                     <h3>History</h3>
@@ -137,8 +154,7 @@ const Chatbot: React.FC = () => {
                     {history.map((item, index) => (
                         <div key={index} className='history-item' onClick={() => fetchConversationDetails(item.id)}>
                             <div>
-                                <span className='history-item-title'>{item.model_name}</span>
-                                <br />
+                                <span className='history-item-title'>{item.summary}</span>
                                 <small className='history-item-date'>{formatDate(item.timestamp)}</small>
                             </div>
                         </div>
@@ -175,8 +191,9 @@ const Chatbot: React.FC = () => {
                             onChange={handleInputChange}
                             onKeyPress={handleKeyPress}
                             placeholder="Type a message..."
+                            className="input-message"
                         />
-                        <button onClick={handleSendMessage} disabled={isLoading}>
+                        <button onClick={handleSendMessage} disabled={isLoading} className="send-button">
                             {isLoading ? 'Sending...' : 'Send'}
                         </button>
                     </div>

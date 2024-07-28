@@ -1,6 +1,9 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class Message(BaseModel):
-    user_input: str
-    bot_output: str
-    datetime: any
+    id: int
+    conversation_id: int
+    user_message: str
+    bot_response: str
+    timestamp: datetime

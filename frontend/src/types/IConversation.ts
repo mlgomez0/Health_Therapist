@@ -5,4 +5,5 @@ export interface IConversation {
     timestamp: string;
     user_score: number,
     user_feedback: string;
+    summary: string;
 }

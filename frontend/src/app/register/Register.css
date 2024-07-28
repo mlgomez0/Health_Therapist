@@ -1,0 +1,248 @@
+body, html {
+  height: 100%;
+  width: 100%; /* Ensure the body and html take the full width */
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0E6DA6 no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  flex-direction: column; /* Use column direction to make the footer align at the bottom */
+  justify-content: space-between; /* Ensure footer is pushed to the bottom */
+  align-items: center;
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 70px; /* Add padding to create some space around the container */
+  box-sizing: border-box; /* Ensure padding is included in the total width and height */
+}
+
+.register-container {
+  display: flex;
+  width: 90%;
+  max-width: 900px;
+  height: auto;
+  max-height: 80%; /* Ensure it doesn't take up the full height */
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  margin-bottom: 70px; /* Ensure there is space below the container */
+}
+
+.welcome-section, .register-section {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 630px; /* Ensure a minimum height for both sections */
+}
+
+.welcome-section {
+  background: #e6f7ff; /* Changed to lighter blue */
+  color: white;
+  text-align: center;
+}
+
+.welcome-section .logo {
+  max-width: 400px; /* Increase the maximum width of the logo */
+  height: 90px; /* Maintain the aspect ratio */
+  margin-bottom: 1em;
+}
+
+.welcome-section h1 {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.welcome-section p {
+  font-size: 1em;
+  margin-bottom: 1em;
+  font-weight: normal;
+  color: #333333; /* Slightly darker color for better readability */
+}
+
+.signin-btn {
+  padding: 0.75em 2em;
+  border: none;
+  border-radius: 4px;
+  background: white;
+  color: #5DADE2; /* Changed to blue */
+  font-size: 1em;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 1em; /* Add margin-top to move the button down */
+}
+
+.signin-btn:hover {
+  background: #f1f1f1;
+}
+
+.register-section {
+  background: white;
+  text-align: center;
+}
+
+.register-section h2 {
+  font-size: 2.5em;
+  color: #5DADE2; /* Changed to blue */
+  margin-bottom: 1em;
+}
+
+.social-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1em;
+}
+
+.social-buttons a {
+  text-decoration: none; /* Remove underline */
+}
+
+.social-btn {
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2em;
+  margin: 0 0.5em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-btn.facebook {
+  background: #3b5998; /* Facebook blue */
+  color: white;
+}
+
+.social-btn.google {
+  background: #db4a39; /* Google red */
+  color: white;
+}
+
+.social-btn.linkedin {
+  background: #0077b5; /* LinkedIn blue */
+  color: white;
+}
+
+.social-btn:hover {
+  opacity: 0.8;
+}
+
+.register-form {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-group {
+  margin-bottom: 1em;
+  text-align: left;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+.checkbox-group label {
+  margin-left: 0.5em;
+  color: #666; /* Ensuring the color matches other text */
+}
+
+.sign-up-btn {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.sign-up-btn button {
+  width: auto;
+  padding: 0.75em 2em;
+  border: none;
+  border-radius: 4px;
+  background: #5DADE2; /* Changed to blue */
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.sign-up-btn button:hover {
+  background: #45a099;
+}
+
+p {
+  color: #666;
+  margin-top: 1em;
+}
+
+p a {
+  color: #5DADE2; /* Changed to blue */
+  text-decoration: none;
+}
+
+p a:hover {
+  text-decoration: underline;
+}
+
+/* Footer Styles */
+.footer {
+  width: 100%;
+  background: #f9f9f9;
+  padding: 1rem;
+  text-align: center;
+  border-top: 1px solid #eaeaea;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1em;
+}
+
+.footer-links a {
+  margin: 0 1em;
+  color: #5DADE2;
+  text-decoration: none;
+}
+
+.footer-icons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1em;
+}
+
+.footer-icons a {
+  margin: 0 0.5em;
+}
+
+.footer-icons img {
+  width: auto; /* Increase the width of the icons */
+  height: 50px; /* Increase the height of the icons */
+}
+
+.footer p {
+  color: #666;
+}
