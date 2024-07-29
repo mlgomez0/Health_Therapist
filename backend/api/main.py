@@ -15,6 +15,7 @@ from src.Rag import Rag  # Ensure Rag is imported correctly
 logging.basicConfig(level=logging.INFO)
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './../ml_models'))
+phi3_enabled = os.getenv("PHI3_MODEL_ENABLED")
 sys.path.append(parent_dir)
 
 init(autoreset=True)
@@ -23,17 +24,16 @@ from fastapi import FastAPI,HTTPException
 from src.request import Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from src.Phi3 import Phi3
 from src.Rag import Rag
 from fastapi.middleware.cors import CORSMiddleware
 from src.infraestructure.ConversationRepository import ConversationRepository
 from src.infraestructure.DbContext import DbContext
 from src.infraestructure.UserRepository import UserRepository
+if phi3_enabled:
+    from src.Phi3 import Phi3
+    phi3 = Phi3()
 
-# Create an instance of the Phi3 and Rag classes
-phi3 = Phi3()
-phi_model_name = os.getenv("PHI3_MODEL_NAME")
-rag = Rag(phi_model_name)
+rag = Rag()
 
 # Create an instance of the FastAPI class
 app = FastAPI()
@@ -54,8 +54,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# phi3 = Phi3()  # Uncomment if using Phi3
-rag = Rag()
 conversation_repository = ConversationRepository(DbContext())
 
 # Register router
@@ -107,7 +105,7 @@ def read_root():
 @app.get("/api/clear")
 def clear_history():
     try:
-        if 'phi3' in globals():
+        if 'phi3' in globals() and phi3_enabled:
             phi3.clear_history()
         return {
             "text": "Conversation history cleared"
@@ -133,7 +131,7 @@ async def chat(request: Request):  # Ensure request is of type Request
         conversation_id = conversation_repository.create_conversation(user_id, model)
 
     response = ""
-    if model == "fine-tuned":
+    if model == "fine-tuned" and phi3_enabled:
         if 'phi3' in globals():
             response = phi3.predict(conversation_id, text)
         else:
@@ -150,7 +148,7 @@ async def chat(request: Request):  # Ensure request is of type Request
 def get_conversation(conversation_id: int):
     try:
         logging.info(f"Fetching details for conversation ID: {conversation_id}")
-        conversation = conversation_repository.get_conversation_by_id(conversation_id)
+        conversation = conversation_repository.get_messages(conversation_id)
         if not conversation:
             logging.error(f"Conversation ID {conversation_id} not found.")
             raise HTTPException(status_code=404, detail="Conversation not found")

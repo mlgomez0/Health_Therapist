@@ -65,7 +65,7 @@ class ConversationRepository:
         return conversation, messages
     
     def get_messages(self, conversation_id: int) -> List[Message]:
-        
+        conversation, messages = self.get_conversation_by_id(conversation_id)
         return {
             "conversation": {
                 "id": conversation[0],

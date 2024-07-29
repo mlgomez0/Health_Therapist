@@ -54,7 +54,7 @@ class PromptTemplate:
         """
         examples = self.similarity_searcher.do_similarity_search_chroma(
                 query, self.collection_name, self.embedding_name, self.chromadb_path, k=1)
-        return self._format_prompt(query, examples)
+        return self._format_prompt(examples)
 
     def two_shot(self, query):
         """
@@ -72,7 +72,7 @@ class PromptTemplate:
         """
         examples = self.similarity_searcher.do_similarity_search_chroma(
                 query, self.collection_name, self.embedding_name, self.chromadb_path, k=2)
-        return self._format_prompt(query, examples)
+        return self._format_prompt(examples)
 
     def few_shot(self, query):
         """
@@ -90,9 +90,9 @@ class PromptTemplate:
         """
         examples = self.similarity_searcher.do_similarity_search_chroma(
                 query, self.collection_name, self.embedding_name, self.chromadb_path, k=3)
-        return self._format_prompt(query, examples)
+        return self._format_prompt(examples)
     
-    def _format_prompt(self, query, examples):
+    def _format_prompt(self, examples):
         """
         Formats the final prompt by combining the query with retrieved examples.
 
@@ -108,11 +108,11 @@ class PromptTemplate:
         str
             The final formatted prompt ready for use.
         """
-        formatted_examples = "\n<|system|>\nYou are a mental health therapist. Please provide a thoughtful and supportive response to the following text<|end|>\n" + "\n".join(
+
+        formatted_examples = "You are a mental health therapist. Please use the following examples to provide a thoughtful and supportive response\n" + "\n".join(
             [f"<|user|>\n{ex['Context']}<|end|>\n<|assistant|>\n{ex['Response']}<|end|>\n" for ex in examples]
         )
-        final_query = formatted_examples + f"<|user|>\n{query}<|end|>\n<|assistant|>\n"
-        return final_query
+        return formatted_examples
     
     def zero_shot(self, query):
         """

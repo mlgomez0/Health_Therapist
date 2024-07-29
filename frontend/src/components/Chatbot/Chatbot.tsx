@@ -50,9 +50,11 @@ const Chatbot: React.FC = () => {
                 throw new Error(`Error fetching conversation details: ${response.statusText}`);
             }
             const data = await response.json();
+
+            console.log("Data:", data)
             
             const newMessages: IMessage[] = [];
-            data.messages.forEach((x: any) => {
+            data?.messages?.forEach((x: any) => {
                 newMessages.push({ text: x.user_message, sender: 'user' });
                 newMessages.push({ text: x.bot_response, sender: 'bot' });
             });
