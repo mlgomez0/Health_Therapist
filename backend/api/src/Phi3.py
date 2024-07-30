@@ -93,8 +93,8 @@ class Phi3():
         # Create an array with the messages splitting the user input and the bot output
         history = [ {"role": "assistant", "content": self.instructions} ]
         for message in messages:
-            history.append({ "role": "user", "content": message.user_input })
-            history.append({ "role": "assistant", "content": message.bot_output })
+            history.append({ "role": "user", "content": message['user_message'] })
+            history.append({ "role": "assistant", "content": message['bot_response'] })
         return history
 
         # Create and return the context
