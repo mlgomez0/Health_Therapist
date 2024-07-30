@@ -1,6 +1,7 @@
-import os
 from .rag_modules.templates import PromptTemplate
-from .rag_modules.hf_api_inference import LlmTalker
+from .rag_modules.azure_api_inference import LlmTalker
+from .infraestructure.ConversationRepository import ConversationRepository
+from .infraestructure.DbContext import DbContext
 
 
 class Rag:
@@ -10,10 +11,23 @@ class Rag:
     Methods
     -------
     predict(conversation_id: str, user_input: str) -> str:
-        Generates a prediction/response based on the user input and context.
+        Generates a prediction/response based on the user input, context and chat history
     """
-    def __init__(self, model_name):
-        self.llm_talker = LlmTalker(model_name)
+    def __init__(self) -> None:
+        self.db = ConversationRepository(DbContext())
+
+    def create_chat_history(self, conversation_id: str) -> str:
+        """
+        Create the chat history for the conversation, including instructions and history.
+        """
+        
+        messages = self.db.get_messages(conversation_id)['messages']
+
+        history = []
+        for message in messages:
+            history.append({ "role": "user", "content": message['user_message'] })
+            history.append({ "role": "assistant", "content": message['bot_response'] })
+        return history
 
     def predict(self, conversation_id: str, user_input: str) -> str:
         """
@@ -30,29 +44,12 @@ class Rag:
         -------
         str
             The generated response.
-
-        Raises
-        ------
-        KeyError
-            If the environment variable `PHI3_MODEL_NAME` is not set.
         """
-        # Retrieve the model name from the environment variables
-        phi_model_name = os.getenv("PHI3_MODEL_NAME")
-        if not phi_model_name:
-            raise KeyError("PHI3_MODEL_NAME environment variable is not set")
-        
-        # Prepare the query and context prompt
-        query = user_input
-        #prompt_context = PromptTemplate().one_shot(query)
 
-        # Initialize the LLM talker with the specified model
-        #llm_talker = LlmTalker(phi_model_name)
+        chat_history = self.create_chat_history(conversation_id)
+        context = PromptTemplate().one_shot(user_input)
+        llm_talker = LlmTalker()
 
-        # Generate the response with context
-        #answer_with_context = llm_talker.start_chat(prompt_context)
-        answer_with_context = self.llm_talker.start_chat_with_history(query)
+        answer = llm_talker.chat(chat_history, context, user_input)
 
-        # Extract and return the final answer
-        answer = answer_with_context.split('<|assistant|>')[-1]
-        
         return answer
