@@ -1,13 +1,20 @@
-import torch
-from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from .rag_modules.azure_api_inference import LlmTalker
 from .infraestructure.ConversationRepository import ConversationRepository
 from .infraestructure.DbContext import DbContext
 from colorama import Fore, init
+from huggingface_hub import login
+from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+import os
+import torch
 
 class Phi3():
 
     def __init__(self) -> None:
+
+        token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+        login(token=token)
+        print(Fore.CYAN + f"TOKEN={token}")
 
         print(Fore.MAGENTA + 'Initializing Phi3 model...')
         self.db = ConversationRepository(DbContext())
@@ -41,16 +48,11 @@ class Phi3():
             "If a user deviates from the topic of mental health, gently steer the conversation back to relevant topics to provide the most effective support."
         ])
 
-
-    def predict(self, conversation_id: int, user_input: str) -> str:
+    def predict(self, conversation_id: int, user_input: str):
 
         # Create context
         context = self.create_context(conversation_id)
         context.append({"role": "user", "content": user_input})
-
-        print('_____________________________________________________________\n')
-        print(context)
-        print('_____________________________________________________________\n')
 
         # Create prompt with context
         prompt_with_context = self.pipe.tokenizer.apply_chat_template(context, tokenize=False)
@@ -75,12 +77,25 @@ class Phi3():
         generated_text = generated_text.split("Note:")[0].strip()
         generated_text = generated_text.split("\n\n")[0].strip()
 
-
         # Save conversation history
         self.db.create_message(conversation_id, user_input, generated_text)
 
+        # Create the summary of the conversation
+        llm = LlmTalker()
+        summary = llm.chat([],
+                 "Please read the following conversation and provide a concise summary in a single sentence (maximun 5 words). The summary should capture the main topic or key event discussed",
+                 generated_text)
+        
+        # Keep only the first 5 words
+        summary = ' '.join(summary.split(" ")[:5])
+
+        # Remove any text after (Note:
+        summary = summary.split("(Note:")[0].strip()
+        
+        self.db.update_summary(conversation_id, summary)
+
         # Return generated text
-        return generated_text
+        return generated_text, summary
     
     def create_context(self, conversation_id: str) -> str:
         """
@@ -88,16 +103,12 @@ class Phi3():
         """
         
         # Get the messages from the conversation
-        messages = self.db.get_messages(conversation_id)
-
+        conversation = self.db.get_messages(conversation_id)
+        messages = conversation['messages']
+        
         # Create an array with the messages splitting the user input and the bot output
         history = [ {"role": "assistant", "content": self.instructions} ]
         for message in messages:
             history.append({ "role": "user", "content": message['user_message'] })
             history.append({ "role": "assistant", "content": message['bot_response'] })
         return history
-
-        # Create and return the context
-        #context = "\n".join([f"{x['role']}: {x['content']}" for x in history])
-        #return context
-        
