@@ -33,6 +33,7 @@ class ConversationRepository:
             SELECT id, user_id, model_name, summary, timestamp
             FROM conversations
             WHERE user_id = ?
+            ORDER BY timestamp DESC
         '''
         items = self.db.query_all(sql, (user_id,))
         

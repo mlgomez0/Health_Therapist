@@ -11,6 +11,7 @@ from src.infraestructure.ConversationRepository import ConversationRepository
 from src.infraestructure.DbContext import DbContext
 from src.infraestructure.UserRepository import UserRepository
 from src.Rag import Rag  # Ensure Rag is imported correctly
+from src.Phi3 import Phi3
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,15 +21,6 @@ sys.path.append(parent_dir)
 
 init(autoreset=True)
 
-from fastapi import FastAPI,HTTPException
-from src.request import Request
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from src.Rag import Rag
-from fastapi.middleware.cors import CORSMiddleware
-from src.infraestructure.ConversationRepository import ConversationRepository
-from src.infraestructure.DbContext import DbContext
-from src.infraestructure.UserRepository import UserRepository
 if phi3_enabled:
     from src.Phi3 import Phi3
     phi3 = Phi3()
@@ -82,9 +74,10 @@ async def register_user(user: UserRegister):
 
 @router.post("/api/login")
 async def login_user(user: UserLogin):
+    
     logging.info(f"Login attempt for username: {user.username}")
     existing_user = user_repository.get_user_by_username(user.username)
-    print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,", existing_user, user.password)
+    
     if existing_user == None or existing_user['password'] != user.password:  # Ensure the index is correct for password
         logging.error("Invalid username or password")
         raise HTTPException(status_code=401, detail="Invalid username or password")
@@ -122,27 +115,42 @@ async def get_history():
 
 @app.post("/api/chat")
 async def chat(request: Request):  # Ensure request is of type Request
+
     user_id = 1
     conversation_id = request.conversation_id
     model = request.model
     text = request.text
-
+    
     if conversation_id <= 0:
+        print(Fore.RED + "Creating new conversation")
         conversation_id = conversation_repository.create_conversation(user_id, model)
+        print(Fore.GREEN + f"New conversation ID: {conversation_id}")
 
     response = ""
-    if model == "fine-tuned" and phi3_enabled:
-        if 'phi3' in globals():
-            response = phi3.predict(conversation_id, text)
+    summary = ""
+    if model == "fine-tuned":
+        if phi3_enabled:
+            if 'phi3' in globals():
+                response, summary = phi3.predict(conversation_id, text)
+            else:
+                response = "phi3 model not initialized."
         else:
-            response = "phi3 model not initialized."
+            response = "phi3 model is disabled."
     elif model == "rag":
         response = rag.predict(conversation_id, text)
     else:
         response = "Invalid model parameter. Please use 'fine-tuned' or 'rag'."
 
     conversation_repository.create_message(conversation_id, text, response)
-    return {"text": response, "conversation_id": conversation_id}
+
+    response = {
+        "text": response,
+        "conversation_id": conversation_id,
+        "summary": summary
+    }
+
+    print(Fore.GREEN + f"Response: {response}")
+    return response
 
 @app.get("/api/conversation/{conversation_id}")
 def get_conversation(conversation_id: int):
