@@ -49,31 +49,31 @@ docker create --name=capstone-project-front -p 3000:3000 capstone-project-front:
 
 ``` bash
 
-docker tag capstone-project-front:1.0.0 docker-registry-name.azurecr.io/capstone-project-front:1.0.0
+docker tag capstone-project-front:1.0.0 container-registry.azurecr.io/capstone-project-front:1.0.0
 ```
 
 ``` bash
-az acr login --name docker-registry-name
-docker push docker-registry-name.azurecr.io/capstone-project-front:1.0.0
+az acr login --name container-registry
+docker push container-registry.azurecr.io/capstone-project-front:1.0.0
 ```
 
 
 ### API
 
 ``` bash
-docker build -t "capstone-project-front" . --tag=capstone-project-front:1.0.0
+docker build -t "capstone-project-back" . --tag=capstone-project-back:1.0.0
 ```
 
 ``` bash
-docker create --name=capstone-project-front -p 3000:3000 capstone-project-front:1.0.0
+docker create --name=capstone-project-back -p 5000:5000 capstone-project-back:1.0.0
 ```
 
 ``` bash
 
-docker tag capstone-project-front:1.0.0 docker-registry-name.azurecr.io/capstone-project-front:1.0.0
+docker tag capstone-project-back:1.0.0 container-registry.azurecr.io/capstone-project-back:1.0.0
 ```
 
 ``` bash
-az acr login --name docker-registry-name
-docker push docker-registry-name.azurecr.io/capstone-project-front:1.0.0
+az acr login --name container-registry
+docker push container-registry.azurecr.io/capstone-project-back:1.0.0
 ```
