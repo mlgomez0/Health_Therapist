@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import './Chatbot.css';
 
-const apiUrl = 'http://127.0.0.1:5000'; // Ensure this matches FastAPI URL
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Chatbot: React.FC = () => {
 
