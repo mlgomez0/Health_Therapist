@@ -172,5 +172,23 @@ $env:COLLECTION_NAME="mental_health_chats"
 
 By runing the script with the above env vars, you will create a folder backend/chroma_db where the vectors DB files would be located
 
+## Publish in Docker
 
+### API
 
+``` bash
+docker build -t "capstone-project-back" . --tag=capstone-project-back:1.0.0
+```
+
+``` bash
+docker create --name=capstone-project-back -p 5000:5000 capstone-project-back:1.0.0
+```
+
+``` bash
+
+docker tag capstone-project-back:1.0.0 dockerioip.azurecr.io/capstone-project-back:1.0.0
+```
+
+``` bash
+az acr login --name dockerioip
+docker push dockerioip.azurecr.io/capstone-project-back:1.0.0

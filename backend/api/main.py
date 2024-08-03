@@ -8,11 +8,9 @@ from src.infraestructure.UserRepository import UserRepository
 from src.Phi3 import Phi3
 from src.Rag import Rag
 from src.request import Request
-from typing import List
 import logging
 import os
 import sys
-import torch
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,7 +27,7 @@ rag = Rag()
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000",  # React frontend
+    os.getenv("ALLOW_ORIGINS") # "http://localhost:3000"
 ]
 # Create an instance of the ConversationRepository class
 conversation_repository = ConversationRepository(DbContext())
