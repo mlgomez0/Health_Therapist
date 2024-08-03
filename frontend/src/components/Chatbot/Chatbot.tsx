@@ -112,7 +112,8 @@ const Chatbot: React.FC = () => {
             setIsLoading(false);
         });
     };
-
+    console.log("hi")
+    console.log(conversationId)
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     };

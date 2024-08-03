@@ -63,8 +63,8 @@ interface FeedbackFormProps {
 }
 
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ conversationId, onSubmit }) => {
-    const [feedback, setFeedback] = useState('');
-    const [rating, setRating] = useState(0);
+    const [user_feedback, setFeedback] = useState('');
+    const [user_score, setRating] = useState(0);
     const [showThankYou, setShowThankYou] = useState(false);
 
     const handleFeedbackChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -80,8 +80,8 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ conversationId, onSubmit })
             const username = localStorage.getItem('username');
             await axios.post('http://localhost:5000/api/feedback', {
                 conversation_id: conversationId,
-                feedback,
-                rating,
+                user_feedback,
+                user_score,
             }, {
                 headers: { 'x-username': username || '' }
             });
@@ -103,7 +103,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ conversationId, onSubmit })
                     {[...Array(5)].map((_, index) => (
                         <Heart
                             key={index}
-                            selected={index < rating}
+                            selected={index < user_score}
                             onClick={() => handleRatingChange(index)}
                         >
                             ♥
@@ -111,7 +111,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ conversationId, onSubmit })
                     ))}
                 </HeartsContainer>
                 <Textarea
-                    value={feedback}
+                    value={user_feedback}
                     onChange={handleFeedbackChange}
                     placeholder="Please provide your feedback here..."
                 />

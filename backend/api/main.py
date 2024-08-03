@@ -82,6 +82,8 @@ async def submit_feedback(feedback: Feedback, request: Request):
         raise HTTPException(status_code=400, detail="Username header is required")
     
     user = user_repository.get_user_by_username(username)
+    print(username)
+    print(feedback)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
