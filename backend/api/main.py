@@ -2,11 +2,10 @@ import os
 import sys
 import logging
 from colorama import Fore, init
-from fastapi import FastAPI, HTTPException, APIRouter  # Ensure Request is imported
+from fastapi import FastAPI, HTTPException, APIRouter, Request  # Ensure Request is imported
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
-from src.request import Request
 from src.infraestructure.ConversationRepository import ConversationRepository
 from src.infraestructure.DbContext import DbContext
 from src.infraestructure.UserRepository import UserRepository
@@ -33,7 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# phi3 = Phi3()  # Uncomment if using Phi3
 rag = Rag()
 conversation_repository = ConversationRepository(DbContext())
 
@@ -48,6 +46,11 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     username: str
     password: str
+
+class Feedback(BaseModel):
+    conversation_id: int
+    user_score: int
+    user_feedback: str
 
 db_context = DbContext()
 user_repository = UserRepository(db_context)
@@ -65,13 +68,25 @@ async def register_user(user: UserRegister):
 async def login_user(user: UserLogin):
     logging.info(f"Login attempt for username: {user.username}")
     existing_user = user_repository.get_user_by_username(user.username)
-    print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,", existing_user, user.password)
-    if existing_user == None or existing_user['password'] != user.password:  # Ensure the index is correct for password
+    if existing_user is None or existing_user['password'] != user.password:
         logging.error("Invalid username or password")
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     logging.info("Login successful")
     return {"message": "Login successful"}
+
+@router.post("/api/feedback")
+async def submit_feedback(feedback: Feedback, request: Request):
+    username = request.headers.get('x-username')
+    if not username:
+        raise HTTPException(status_code=400, detail="Username header is required")
+    
+    user = user_repository.get_user_by_username(username)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    conversation_repository.update_feedback(feedback.conversation_id, feedback.user_score, feedback.user_feedback)
+    return {"message": "Feedback submitted successfully"}
 
 app.include_router(router)
 
@@ -86,8 +101,6 @@ def read_root():
 @app.get("/api/clear")
 def clear_history():
     try:
-        if 'phi3' in globals():
-            phi3.clear_history()
         return {
             "text": "Conversation history cleared"
         }
@@ -111,17 +124,7 @@ async def chat(request: Request):  # Ensure request is of type Request
     if conversation_id <= 0:
         conversation_id = conversation_repository.create_conversation(user_id, model)
 
-    response = ""
-    if model == "fine-tuned":
-        if 'phi3' in globals():
-            response = phi3.predict(conversation_id, text)
-        else:
-            response = "phi3 model not initialized."
-    elif model == "rag":
-        response = rag.predict(conversation_id, text)
-    else:
-        response = "Invalid model parameter. Please use 'fine-tuned' or 'rag'."
-
+    response = rag.predict(conversation_id, text)
     conversation_repository.create_message(conversation_id, text, response)
     return {"text": response, "conversation_id": conversation_id}
 

@@ -211,7 +211,7 @@ const LoginPage = () => {
       if (response.status === 200) {
         setMessage('Login successful');
         localStorage.setItem('username', username); // Save username to localStorage
-        router.push('/'); // Navigate to the home page on successful login
+        router.push('/chat'); // Navigate to the home page on successful login
       } else {
         setMessage(response.data.detail || 'Invalid username or password');
       }
@@ -269,7 +269,7 @@ const LoginPage = () => {
               </InputWrapper>
               <ForgotPasswordLink href="/forgot-password">Forgot password?</ForgotPasswordLink>
               <Button type="submit">Login</Button>
-              {message && <p>{typeof message === 'string' ? message : 'An error occurred'}</p>}
+              {message && <p>{message}</p>}
               <RegisterContainer>
                 <RegisterText>Not on Mind2Heart yet?</RegisterText>
                 <RegisterLink href="/register">Create new account</RegisterLink>
