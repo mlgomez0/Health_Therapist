@@ -38,6 +38,7 @@ class DbContext:
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                 user_score INTEGER DEFAULT 0,
                 user_feedback TEXT,
+                summary TEXT,
                 CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users (id)
             )
         '''

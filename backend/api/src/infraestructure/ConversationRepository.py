@@ -1,5 +1,8 @@
 from typing import List
 from .DbContext import DbContext
+from src.domain.Conversation import Conversation
+from pydantic import TypeAdapter
+from src.domain.Message import Message
 
 class ConversationRepository:
     def __init__(self, db: DbContext):
@@ -38,6 +41,7 @@ class ConversationRepository:
             SELECT id, user_id, model_name, summary, timestamp
             FROM conversations
             WHERE user_id = ?
+            ORDER BY timestamp DESC
         '''
         items = self.db.query_all(sql, (user_id,))
         
@@ -66,7 +70,11 @@ class ConversationRepository:
             FROM messages WHERE conversation_id = ?
         '''
         messages = self.db.query_all(sql, (conversation_id,))
-        
+
+        return conversation, messages
+    
+    def get_messages(self, conversation_id: int) -> List[Message]:
+        conversation, messages = self.get_conversation_by_id(conversation_id)
         return {
             "conversation": {
                 "id": conversation[0],
@@ -86,3 +94,5 @@ class ConversationRepository:
                 for message in messages
             ]
         }
+
+

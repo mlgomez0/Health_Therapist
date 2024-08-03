@@ -34,3 +34,46 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Publish in Docker
+
+### Front
+
+``` bash
+docker build -t "capstone-project-front" . --tag=capstone-project-front:1.0.0
+```
+
+``` bash
+docker create --name=capstone-project-front -p 3000:3000 capstone-project-front:1.0.0
+```
+
+``` bash
+
+docker tag capstone-project-front:1.0.0 container-registry.azurecr.io/capstone-project-front:1.0.0
+```
+
+``` bash
+az acr login --name container-registry
+docker push container-registry.azurecr.io/capstone-project-front:1.0.0
+```
+
+
+### API
+
+``` bash
+docker build -t "capstone-project-back" . --tag=capstone-project-back:1.0.0
+```
+
+``` bash
+docker create --name=capstone-project-back -p 5000:5000 capstone-project-back:1.0.0
+```
+
+``` bash
+
+docker tag capstone-project-back:1.0.0 container-registry.azurecr.io/capstone-project-back:1.0.0
+```
+
+``` bash
+az acr login --name container-registry
+docker push container-registry.azurecr.io/capstone-project-back:1.0.0
+```
