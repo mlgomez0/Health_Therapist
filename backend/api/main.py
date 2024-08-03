@@ -209,7 +209,7 @@ def delete_user(user_id: int):
         raise HTTPException(status_code=404, detail="User not found")
 
 @router.post("/api/feedback")
-async def submit_feedback(feedback: Feedback, request: Request):
+async def submit_feedback(feedback: Feedback):
     username = request.headers.get('x-username')
     if not username:
         raise HTTPException(status_code=400, detail="Username header is required")

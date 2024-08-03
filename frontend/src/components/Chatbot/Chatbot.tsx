@@ -8,6 +8,8 @@ import MarkdownPreview from '@uiw/react-markdown-preview';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import './Chatbot.css';
+import FeedbackForm from '../FeedbackForm';
+import Modal from '../Modal';
 
 const apiUrl = 'http://127.0.0.1:5000'; // Ensure this matches FastAPI URL
 
@@ -20,6 +22,8 @@ const Chatbot: React.FC = () => {
     const [ selectedModel, setSelectedModel ] = useState<'fine-tuned' | 'rag'>('fine-tuned');
     const [ conversationId, setConversationId ] = useState(0);
     const [ history, setHistory ] = useState<IConversation[]>([]);
+    const [ showFeedbackForm, setShowFeedbackForm ] = useState(false);
+    const [ showThankYou, setShowThankYou ] = useState(false);
     const username = "aiswarya_prabhalan"; // Replace with actual username from context or props
     const router = useRouter(); // For navigation
 
@@ -137,6 +141,19 @@ const Chatbot: React.FC = () => {
     const handleNewChat = () => {
         setMessages([]);
         setConversationId(0);
+        setShowFeedbackForm(false);
+    };
+
+    const handleEndChat = () => {
+        setShowFeedbackForm(true);
+    };
+
+    const handleFeedbackSubmit = () => {
+        setShowFeedbackForm(false);
+        setShowThankYou(true);
+        setTimeout(() => {
+            setShowThankYou(false);
+        }, 3000);
     };
 
     return <div className="chat-wrapper">
@@ -207,7 +224,20 @@ const Chatbot: React.FC = () => {
                     <button onClick={handleSendMessage} disabled={isLoading} className="send-button">
                         {isLoading ? 'Sending...' : 'Send'}
                     </button>
+                    <button onClick={handleEndChat} className="end-chat-button">
+                        End Chat
+                    </button>
                 </div>
+                {showFeedbackForm && (
+                    <Modal>
+                        <FeedbackForm conversationId={conversationId} onSubmit={handleFeedbackSubmit} />
+                    </Modal>
+                )}
+                {showThankYou && (
+                    <Modal>
+                        <h2>Thank you for your feedback!</h2>
+                    </Modal>
+                )}
             </div>
         </div>
     </div>

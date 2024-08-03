@@ -189,10 +189,10 @@ const FooterSocialIcon = styled.img`
 `;
 
 const LoginPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [ showPassword, setShowPassword ] = useState(false);
+  const [ username, setUsername ] = useState('');
+  const [ password, setPassword ] = useState('');
+  const [ message, setMessage ] = useState('');
   const router = useRouter();
 
   const togglePasswordVisibility = () => {
@@ -203,7 +203,7 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/api/login', {
+      const response = await axios.post('http://127.0.01:5000/api/login', {
         username,
         password
       });
