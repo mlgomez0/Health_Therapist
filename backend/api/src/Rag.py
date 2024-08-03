@@ -15,6 +15,7 @@ class Rag:
     """
     def __init__(self) -> None:
         self.db = ConversationRepository(DbContext())
+        self.prompt_template = PromptTemplate()
 
         # Load the LLM API client
         api_url = os.getenv("PHI3_BASE_MODEL_URL")
@@ -52,7 +53,7 @@ class Rag:
         """
 
         chat_history = self.create_chat_history(conversation_id)
-        context = PromptTemplate().one_shot(user_input)
+        context = self.prompt_template.one_shot(user_input)
 
         messages = chat_history + [
             {

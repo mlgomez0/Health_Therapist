@@ -34,7 +34,7 @@ class PromptTemplate:
         collection name, and similarity searcher.
         """
         self.embedding_name = os.getenv('EMBEDDING_NAME')
-        self.chromadb_path = os.getenv('CHROMA_DB_DIR')
+        self.chromadb_path = os.getenv('PERSIST_DIRECTORY')
         self.collection_name = os.getenv('COLLECTION_NAME')
 
         print(f"Embedding Name: {self.embedding_name}")
