@@ -12,6 +12,9 @@ class LlmApiClient:
             'Authorization': self.azure_api_token
         }
 
+        print(Fore.YELLOW + f"API URL: {self.phi3_model_url}")
+        print(Fore.YELLOW + f"API TOKEN: {self.azure_api_token}")
+
     def predict(self, messages):
         """
         Predict the next message based on the conversation history and the user input using an Azure AI endpoint.

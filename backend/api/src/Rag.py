@@ -16,6 +16,11 @@ class Rag:
     def __init__(self) -> None:
         self.db = ConversationRepository(DbContext())
 
+        # Load the LLM API client
+        api_url = os.getenv("PHI3_BASE_MODEL_URL")
+        api_token = os.getenv("BASE_MODEL_API_KEY")
+        self.llm_talker = LlmApiClient(api_url, api_token)
+
     def create_chat_history(self, conversation_id: str) -> str:
         """
         Create the chat history for the conversation, including instructions and history.
@@ -49,11 +54,6 @@ class Rag:
         chat_history = self.create_chat_history(conversation_id)
         context = PromptTemplate().one_shot(user_input)
 
-        api_url = os.getenv("PHI3_BASE_MODEL_URL")
-        api_token = os.getenv("FINE_TUNED_MODEL_URL")
-        
-        llm_talker = LlmApiClient(api_url, api_token)
-
         messages = chat_history + [
             {
                 'role': 'system',
@@ -65,6 +65,6 @@ class Rag:
             }
         ]
 
-        answer = llm_talker.predict(messages)
+        answer = self.llm_talker.predict(messages)
 
         return answer

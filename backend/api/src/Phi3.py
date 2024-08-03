@@ -105,7 +105,7 @@ class Phi3():
 
     def inititalize_local(self):
 
-        token = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+        token = os.getenv("HF_API_TOKEN")
         login(token=token)
         print(Fore.CYAN + f"TOKEN={token}")
 
