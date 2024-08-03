@@ -1,8 +1,8 @@
 from .rag_modules.templates import PromptTemplate
-from .rag_modules.azure_api_inference import LlmTalker
+from .rag_modules.LlmApiClient import LlmApiClient
 from .infraestructure.ConversationRepository import ConversationRepository
 from .infraestructure.DbContext import DbContext
-
+import os
 
 class Rag:
     """
@@ -15,6 +15,11 @@ class Rag:
     """
     def __init__(self) -> None:
         self.db = ConversationRepository(DbContext())
+
+        # Load the LLM API client
+        api_url = os.getenv("PHI3_BASE_MODEL_URL")
+        api_token = os.getenv("BASE_MODEL_API_KEY")
+        self.llm_talker = LlmApiClient(api_url, api_token)
 
     def create_chat_history(self, conversation_id: str) -> str:
         """
@@ -48,8 +53,18 @@ class Rag:
 
         chat_history = self.create_chat_history(conversation_id)
         context = PromptTemplate().one_shot(user_input)
-        llm_talker = LlmTalker()
 
-        answer = llm_talker.chat(chat_history, context, user_input)
+        messages = chat_history + [
+            {
+                'role': 'system',
+                'content': f"Context: {context}"
+            },
+            {
+                'role': 'user',
+                'content': user_input
+            }
+        ]
+
+        answer = self.llm_talker.predict(messages)
 
         return answer

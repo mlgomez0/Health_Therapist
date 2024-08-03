@@ -23,8 +23,9 @@ pip install -r requirements.txt
 
 4. Set the following Env Variables
 
-```bash
+MacOS
 
+```bash
 HF_API_TOKEN=XXXX
 EMBEDDING_NAME=sentence-transformers/all-MiniLM-L6-v2
 DATASET_PATH=backend/ml_models/datasets/dataset.csv
@@ -32,9 +33,26 @@ PERSIST_DIRECTORY=backend/api/chroma_db
 CHROMA_DB_DIR=chroma_db
 COLLECTION_NAME=mental_health_chats
 PHI3_MODEL_NAME=microsoft/Phi-3-mini-4k-instruct
-PHI3_MODEL_URL="" # model url in azure
-AZURE_API_TOKEN=""
-PHI3_MODEL_ENABLED=False # Or True if you want to run fine-tuned RAG
+PHI3_BASE_MODEL_URL="https://endpoint-url/chat/completions"
+FINE_TUNED_MODEL_URL="https://endpoint-url/chat/completions"
+BASE_MODEL_API_KEY="XXX"
+FINE_TUNED_MODEL_API_KEY="XXX"
+```
+
+Windows
+
+```powershell
+$env:HF_API="XXXX"
+$env:EMBEDDING_NAME="sentence-transformers/all-MiniLM-L6-v2"
+$env:DATASET_PATH="backend/ml_models/datasets/dataset.csv"
+$env:PERSIST_DIRECTORY="backend/api/chroma_db"
+$env:CHROMA_DB_DIR="chroma_db"
+$env:COLLECTION_NAME="mental_health_chats"
+$env:PHI3_MODEL_NAME="microsoft/Phi-3-mini-4k-instruct"
+$env:PHI3_BASE_MODEL_URL="https://endpoint-url/chat/completions"
+$env:FINE_TUNED_MODEL_URL="https://endpoint-url/chat/completions"
+$env:BASE_MODEL_API_KEY="XXX"
+$env:FINE_TUNED_MODEL_API_KEY="XXX"
 ```
 
 ## Run service
@@ -116,29 +134,40 @@ wsl --shutdown
 
 ### Method to create user and a conversation for testing
 
-    ```bash
-    python test_db.py <path_db> create_user <user_name>
-    ```
+```bash
+python test_db.py <path_db> create_user <user_name>
+```
 
-    ```bash
-    python test_db.py <path_db> create_conversation <user_id> <Context> <Answer>
-    ```
+```bash
+python test_db.py <path_db> create_conversation <user_id> <Context> <Answer>
+```
+
 ## Setting up ChromaDB Vector Store
 
 Run the following script:
 
-    ```bash
-    python backend/api/load_vectors/load_embeddings.py
-    ```
+```bash
+python backend/api/load_vectors/load_embeddings.py
+```
 
 For this script to run, you have to export the following env variables:
 
-    ```bash
-    export EMBEDDING_NAME="sentence-transformers/all-MiniLM-L6-v2"
-    export DATASET_PATH="backend/ml_models/datasets/dataset.csv"
-    export PERSIST_DIRECTORY="backend/api/chroma_db"
-    export COLLECTION_NAME="mental_health_chats"
-    ```
+MacOS
+
+```bash
+export EMBEDDING_NAME="sentence-transformers/all-MiniLM-L6-v2"
+export DATASET_PATH="backend/ml_models/datasets/dataset.csv"
+export PERSIST_DIRECTORY="backend/api/chroma_db"
+export COLLECTION_NAME="mental_health_chats"
+```
+
+Windows
+```powershell
+$env:EMBEDDING_NAME="sentence-transformers/all-MiniLM-L6-v2"
+$env:DATASET_PATH="backend/ml_models/datasets/dataset.csv"
+$env:PERSIST_DIRECTORY="backend/api/chroma_db"
+$env:COLLECTION_NAME="mental_health_chats"
+```
 
 
 By runing the script with the above env vars, you will create a folder backend/chroma_db where the vectors DB files would be located

@@ -36,6 +36,11 @@ class PromptTemplate:
         self.embedding_name = os.getenv('EMBEDDING_NAME')
         self.chromadb_path = os.getenv('CHROMA_DB_DIR')
         self.collection_name = os.getenv('COLLECTION_NAME')
+
+        print(f"Embedding Name: {self.embedding_name}")
+        print(f"Chroma DB Path: {self.chromadb_path}")
+        print(f"Collection Name: {self.collection_name}")
+
         self.similarity_searcher = SimilaritySearcher()
 
     def one_shot(self, query):

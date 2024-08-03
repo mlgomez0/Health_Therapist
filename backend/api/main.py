@@ -1,30 +1,28 @@
-import os
-import sys
-import logging
 from colorama import Fore, init
 from fastapi import FastAPI, HTTPException, APIRouter  # Ensure Request is imported
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
-from src.request import Request
 from src.infraestructure.ConversationRepository import ConversationRepository
 from src.infraestructure.DbContext import DbContext
 from src.infraestructure.UserRepository import UserRepository
-from src.Rag import Rag  # Ensure Rag is imported correctly
 from src.Phi3 import Phi3
+from src.Rag import Rag
+from src.request import Request
+from typing import List
+import logging
+import os
+import sys
+import torch
 
 logging.basicConfig(level=logging.INFO)
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), './../ml_models'))
-phi3_enabled = os.getenv("PHI3_MODEL_ENABLED")
 sys.path.append(parent_dir)
 
 init(autoreset=True)
 
-if phi3_enabled:
-    from src.Phi3 import Phi3
-    phi3 = Phi3()
-
+# Create the Phi3 and Rag models
+phi3 = Phi3()
 rag = Rag()
 
 # Create an instance of the FastAPI class
@@ -98,8 +96,7 @@ def read_root():
 @app.get("/api/clear")
 def clear_history():
     try:
-        if 'phi3' in globals() and phi3_enabled:
-            phi3.clear_history()
+        phi3.clear_history()
         return {
             "text": "Conversation history cleared"
         }
@@ -129,13 +126,7 @@ async def chat(request: Request):  # Ensure request is of type Request
     response = ""
     summary = ""
     if model == "fine-tuned":
-        if phi3_enabled:
-            if 'phi3' in globals():
-                response, summary = phi3.predict(conversation_id, text)
-            else:
-                response = "phi3 model not initialized."
-        else:
-            response = "phi3 model is disabled."
+        response, summary = phi3.predict(conversation_id, text)
     elif model == "rag":
         response = rag.predict(conversation_id, text)
     else:
