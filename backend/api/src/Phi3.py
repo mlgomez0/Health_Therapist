@@ -67,9 +67,6 @@ class Phi3():
         else:
             generated_text = self.api_client.predict(messages)
 
-        # Save conversation history
-        self.db.create_message(conversation_id, user_input, generated_text)
-
         # Create the summary of the conversation
         #summary = self.create_summary(messages[1:])
         summary = "Chat"
