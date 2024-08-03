@@ -32,9 +32,8 @@ PERSIST_DIRECTORY=backend/api/chroma_db
 CHROMA_DB_DIR=chroma_db
 COLLECTION_NAME=mental_health_chats
 PHI3_MODEL_NAME=microsoft/Phi-3-mini-4k-instruct
-PHI3_MODEL_URL="" # model url in azure
+PHI3_BASE_MODEL_URL="" # model url in azure
 AZURE_API_TOKEN=""
-PHI3_MODEL_ENABLED=False # Or True if you want to run fine-tuned RAG
 ```
 
 ## Run service
