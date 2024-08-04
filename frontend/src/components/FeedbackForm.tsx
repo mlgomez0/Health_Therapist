@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import Modal from './Modal';
 
 const FeedbackWrapper = styled.div`
     display: flex;
@@ -28,6 +27,22 @@ const Textarea = styled.textarea`
     border: 1px solid #ccc;
 `;
 
+const HeartContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+
+    .heart {
+        cursor: pointer;
+        font-size: 2rem;
+        color: lightgray;
+    }
+
+    .heart.selected {
+        color: red;
+    }
+`;
+
 const Button = styled.button`
     padding: 0.5rem 2rem;
     background-color: #007bff;
@@ -40,23 +55,6 @@ const Button = styled.button`
     }
 `;
 
-const HeartsContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-`;
-
-const Heart = styled.span<{ selected: boolean }>`
-    font-size: 2rem;
-    cursor: pointer;
-    color: ${props => (props.selected ? 'red' : 'lightgray')};
-    transition: color 0.3s;
-
-    &:hover {
-        color: red;
-    }
-`;
-
 interface FeedbackFormProps {
     conversationId: number;
     onSubmit: () => void;
@@ -65,7 +63,6 @@ interface FeedbackFormProps {
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ conversationId, onSubmit }) => {
     const [user_feedback, setFeedback] = useState('');
     const [user_score, setRating] = useState(0);
-    const [showThankYou, setShowThankYou] = useState(false);
 
     const handleFeedbackChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setFeedback(e.target.value);
@@ -78,18 +75,14 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ conversationId, onSubmit })
     const handleSubmit = async () => {
         try {
             const username = localStorage.getItem('username');
-            await axios.post('http://localhost:5000/api/feedback', {
+            await axios.post('http://127.0.0.1:5000/api/feedback', {
                 conversation_id: conversationId,
                 user_feedback,
                 user_score,
             }, {
                 headers: { 'x-username': username || '' }
             });
-            setShowThankYou(true);
-            setTimeout(() => {
-                setShowThankYou(false);
-                onSubmit();
-            }, 3000);
+            onSubmit();
         } catch (error) {
             console.error('Error submitting feedback', error);
         }
@@ -99,17 +92,17 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ conversationId, onSubmit })
         <FeedbackWrapper>
             <FeedbackContainer>
                 <h2>Feedback</h2>
-                <HeartsContainer>
+                <HeartContainer>
                     {[...Array(5)].map((_, index) => (
-                        <Heart
+                        <span
                             key={index}
-                            selected={index < user_score}
+                            className={`heart ${index < user_score ? 'selected' : ''}`}
                             onClick={() => handleRatingChange(index)}
                         >
                             ♥
-                        </Heart>
+                        </span>
                     ))}
-                </HeartsContainer>
+                </HeartContainer>
                 <Textarea
                     value={user_feedback}
                     onChange={handleFeedbackChange}
@@ -117,11 +110,6 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ conversationId, onSubmit })
                 />
                 <Button onClick={handleSubmit}>Submit</Button>
             </FeedbackContainer>
-            {showThankYou && (
-                <Modal>
-                    <h2>Thank you for your feedback!</h2>
-                </Modal>
-            )}
         </FeedbackWrapper>
     );
 };
