@@ -25,8 +25,15 @@ const Chatbot: React.FC = () => {
     const [showThankYou, setShowThankYou] = useState(false);
     const router = useRouter(); // For navigation
 
-    // Retrieve the username from localStorage
-    const username = typeof window !== 'undefined' ? localStorage.getItem('username') : '';
+    const [username, setUsername] = useState<string>('');
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setUsername(localStorage.getItem('username') || '');
+            setUserId(localStorage.getItem('user_id'));
+        }
+    }, []);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -35,7 +42,7 @@ const Chatbot: React.FC = () => {
     useEffect(() => {
         const loadConversations = async () => {
             try {
-                const response = await fetch(`${apiUrl}/api/history`, { headers: { 'Content-Type': 'application/json' } });
+                const response = await fetch(`${apiUrl}/api/history`, { headers: { 'Content-Type': 'application/json', 'x-user-id': userId || '' } });
                 if (!response.ok) {
                     throw new Error(`Error fetching history: ${response.statusText}`);
                 }
@@ -45,12 +52,14 @@ const Chatbot: React.FC = () => {
                 console.error("Error fetching history:", error);
             }
         };
-        loadConversations();
-    }, []);
+        if (userId) {
+            loadConversations();
+        }
+    }, [userId]);
 
     const fetchConversationDetails = async (conversationId: number) => {
         try {
-            const response = await fetch(`${apiUrl}/api/conversation/${conversationId}`, { headers: { 'Content-Type': 'application/json' } });
+            const response = await fetch(`${apiUrl}/api/conversation/${conversationId}`, { headers: { 'Content-Type': 'application/json', 'x-user-id': userId || '' } });
             if (!response.ok) {
                 throw new Error(`Error fetching conversation details: ${response.statusText}`);
             }
@@ -69,7 +78,7 @@ const Chatbot: React.FC = () => {
     };
 
     const handleSendMessage = () => {
-        if (inputValue.trim() === '') return;
+        if (inputValue.trim() === '' || !userId) return;
 
         const newMessage: IMessage = {
             text: inputValue,
@@ -82,12 +91,12 @@ const Chatbot: React.FC = () => {
 
         fetch(`${apiUrl}/api/chat`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-user-id': userId},
             body: JSON.stringify({
                 model: selectedModel,
                 text: inputValue,
                 conversation_id: conversationId,
-                user_id: 1 // You might want to replace this with a dynamic user ID
+                user_id: userId  
             })
         })
         .then(response => {
@@ -123,8 +132,9 @@ const Chatbot: React.FC = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('username'); // Clear username from local storage on logout
-        router.push('/login'); // Navigate to the login page
+        localStorage.removeItem('username'); 
+        localStorage.removeItem('user_id'); 
+        router.push('/login'); 
     };
 
     const handleNewChat = () => {
@@ -138,23 +148,26 @@ const Chatbot: React.FC = () => {
     };
 
     const handleSubmitFeedback = async (feedbackData: { rating: number; comment: string }) => {
-            setShowFeedbackForm(false);
-            setShowThankYou(true);
-            setTimeout(() => setShowThankYou(false), 3000); // Hide thank you message after 3 seconds
+        setShowFeedbackForm(false);
+        setShowThankYou(true);
+        setTimeout(() => setShowThankYou(false), 3000); 
     };
 
     return (
         <div className="chat-wrapper">
             <div className="header">
                 <img src="/logo_2.png" alt="Mind2Heart Logo" className="logo" />
-                <select
-                    value={selectedModel}
-                    onChange={(e) => setSelectedModel(e.target.value as 'fine-tuned' | 'rag')}
-                    className="model-select"
-                >
-                    <option value="fine-tuned">Fine-tuned</option>
-                    <option value="rag">Rag</option>
-                </select>
+                <div className="with-whom">
+                    <p>Who would you like to chat with today?</p>
+                    <select
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value as 'fine-tuned' | 'rag')}
+                        className="model-select"
+                    >
+                        <option value="fine-tuned">Fiona</option>
+                        <option value="rag">Rosa</option>
+                    </select>
+                </div>
                 <div className="header-right">
                     <span className="username">{username}</span>
                     <Menu menuButton={<MenuButton className="user-button"><img src="/images/user-icon.png" alt="User Icon" className="user-icon" /></MenuButton>}>

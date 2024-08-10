@@ -1,5 +1,5 @@
 from colorama import Fore, init
-from fastapi import FastAPI, HTTPException, APIRouter, Request  # Ensure Request is imported
+from fastapi import FastAPI, HTTPException, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from src.request import LlmRequest
@@ -41,7 +41,7 @@ rag = Rag()
 app = FastAPI()
 
 origins = [
-    os.getenv("ALLOW_ORIGINS") # "http://localhost:3000"
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
@@ -76,12 +76,14 @@ async def register_user(user: UserRegister):
 async def login_user(user: UserLogin):
     logging.info(f"Login attempt for username: {user.username}")
     existing_user = user_repository.get_user_by_username(user.username)
-    if existing_user == None or existing_user['password'] != user.password:  # Ensure the index is correct for password
+    logging.info(f"Existing user: {existing_user}")
+
+    if not existing_user or existing_user['password'] != user.password:
         logging.error("Invalid username or password")
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     logging.info("Login successful")
-    return {"message": "Login successful"}
+    return {"message": "Login successful", "user_id": existing_user['id']}
 
 app.include_router(router)
 
@@ -105,21 +107,29 @@ def clear_history():
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @app.get("/api/history")
-async def get_history():
-    user_id = 1  # Assuming a single user for simplicity
-    result = conversation_repository.get_conversations(user_id)
+async def get_history(request: Request):
+    user_id = request.headers.get('x-user-id')
+    print("Hello",user_id)
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID header is required")
+    
+    result = conversation_repository.get_conversations(int(user_id))
     return result
 
+
 @app.post("/api/chat")
-async def chat(request: LlmRequest):  # Ensure request is of type Request
-    user_id = 1
+async def chat(request: LlmRequest, http_request: Request):
+    user_id = http_request.headers.get('x-user-id')
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID header is required")
+    
     conversation_id = request.conversation_id
     model = request.model
     text = request.text
 
     if conversation_id <= 0:
         print(Fore.RED + "Creating new conversation")
-        conversation_id = conversation_repository.create_conversation(user_id, model)
+        conversation_id = conversation_repository.create_conversation(int(user_id), model)
         print(Fore.GREEN + f"New conversation ID: {conversation_id}")
 
     response = ""
@@ -155,44 +165,6 @@ def get_conversation(conversation_id: int):
     except Exception as e:
         logging.error(f"Error in /api/conversation/{conversation_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
-
-@app.get("/api/history")
-def get_conversations():
-    """
-    Returns the conversations history
-    """
-    user_id = 1
-    result = conversation_repository.get_conversations(user_id)
-    return result
-
-# User management API models and endpoints
-class User(BaseModel):
-    username: str
-    password: str
-
-@app.post("/users/")
-def create_user(user: User):
-    user_id = user_repository.insert_user(user.username, user.password)
-    if user_id:
-        return {"id": user_id, "username": user.username}
-    else:
-        raise HTTPException(status_code=400, detail="User creation failed")
-
-@app.put("/users/{user_id}")
-def update_user(user_id: int, user: User):
-    rows_affected = user_repository.update_user(user_id, user.username, user.password)
-    if rows_affected:
-        return {"message": "User updated successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="User not found")
-
-@app.delete("/users/{user_id}")
-def delete_user(user_id: int):
-    rows_affected = user_repository.delete_user(user_id)
-    if rows_affected:
-        return {"message": "User deleted successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="User not found")
 
 @app.post("/api/feedback")
 async def submit_feedback(feedback: Feedback, request: Request):

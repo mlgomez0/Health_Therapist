@@ -94,5 +94,3 @@ class ConversationRepository:
                 for message in messages
             ]
         }
-
-

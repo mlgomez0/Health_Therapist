@@ -24,7 +24,7 @@ const Register: React.FC = () => {
       const response = await axios.post('http://localhost:5000/api/register', { username, email, password });
       setMessage(response.data.message);
       if (response.data.message === "Registration successful") {
-        router.push('/login'); // Navigate to login page on successful registration
+        window.location.href = '/login'; // Navigate to login page on successful registration
       }
     } catch (error: any) {
       if (axios.isAxiosError(error) && error.response && error.response.data && error.response.data.detail) {
@@ -49,11 +49,11 @@ const Register: React.FC = () => {
         </div>
         <div className="register-section">
           <h2>Create Account</h2>
-          <div className="social-buttons">
+          {/* <div className="social-buttons">
             <a href="https://www.facebook.com/login" className="social-btn facebook" target="_blank" rel="noopener noreferrer">f</a>
             <a href="https://accounts.google.com/signin" className="social-btn google" target="_blank" rel="noopener noreferrer">G+</a>
             <a href="https://www.linkedin.com/login" className="social-btn linkedin" target="_blank" rel="noopener noreferrer">in</a>
-          </div>
+          </div> */}
           <p>or use your email for registration:</p>
           <form className="register-form" onSubmit={handleRegister}>
             <div className="form-group">
