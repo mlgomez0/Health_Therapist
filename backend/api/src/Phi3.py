@@ -1,23 +1,14 @@
 from .rag_modules.LlmApiClient import LlmApiClient
 from .infraestructure.ConversationRepository import ConversationRepository
 from .infraestructure.DbContext import DbContext
-from colorama import Fore, init
-from huggingface_hub import login
-from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from colorama import Fore
 import os
-import torch
 
 class Phi3():
 
     def __init__(self) -> None:
 
         self.db = ConversationRepository(DbContext())
-
-        self.use_local = torch.cuda.is_available()
-        self.use_local = False
-        if self.use_local:
-            self.inititalize_local()
         self.initialize_remote()
 
         # Instructions
@@ -102,29 +93,6 @@ class Phi3():
         history.append({"role": "user", "content": user_input})
 
         return history
-
-    def inititalize_local(self):
-
-        token = os.getenv("HF_API_TOKEN")
-        login(token=token)
-        print(Fore.CYAN + f"TOKEN={token}")
-
-        # Settings
-        model_name = 'acorreal/phi3-mental-health'
-        adapter_name = 'acorreal/adapter-phi-3-mini-mental-health'
-        compute_dtype = torch.bfloat16
-
-        # Load model
-        model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True, torch_dtype=compute_dtype)
-        model = PeftModel.from_pretrained(model, adapter_name)
-        model = model.merge_and_unload()
-        print(Fore.MAGENTA + 'Model loaded')
-
-        # Load tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(adapter_name)
-        print(Fore.MAGENTA + 'Tokenizer loaded')
-
-        self.pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
     def initialize_remote(self):
         """

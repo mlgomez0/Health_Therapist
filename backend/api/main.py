@@ -8,11 +8,9 @@ from src.infraestructure.UserRepository import UserRepository
 from src.Phi3 import Phi3
 from src.Rag import Rag
 from src.request import Request
-from typing import List
 import logging
 import os
 import sys
-import torch
 
 logging.basicConfig(level=logging.INFO)
 

@@ -1,6 +1,5 @@
 import numpy as np
 from transformers import AutoTokenizer, AutoModel
-import torch
 import chromadb
 from chromadb.config import Settings
 

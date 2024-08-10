@@ -100,22 +100,22 @@ Content-Type: application/json
 
 1. Create a Docker image
     ```bash
-    docker build -t "captone-project-term3" . --tag=captone-project-term3:1.0.0
+    docker build -t "captone-project-api" . --tag=captone-project-api:1.0.0
     ```
 
 2. Create a container. The parameter -p has the format hostport:dockerport
     ```bash
-    docker create --name=captone-project-term3 -p 5000:5000 captone-project-term3:1.0.0
+    docker create --name=captone-project-api -p 5000:5000 captone-project-api:1.0.0
     ```
 
 3. Create a tag. You can change the version as needed
     ```bash
-    docker tag captone-project-term3:1.0.0 dockername.azurecr.io/captone-project-term3:1.0.0
+    docker tag captone-project-api:1.0.0 docker___name.azurecr.io/captone-project-api:1.0.0
     ```
 4. Push the image to Azure Container Registry
     ```bash
-    az acr login --name dockername
-    docker push dockername.azurecr.io/captone-project-term3:1.0.0
+    az acr login --name docker___name
+    docker push docker___name.azurecr.io/captone-project-api:1.0.0
     ```
 
 

@@ -2,7 +2,6 @@ import os
 import numpy as np
 import pandas as pd
 from transformers import AutoTokenizer, AutoModel
-import torch
 import chromadb
 import sys
 
