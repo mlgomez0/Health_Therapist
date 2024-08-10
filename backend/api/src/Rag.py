@@ -18,8 +18,8 @@ class Rag:
         self.prompt_template = PromptTemplate()
 
         # Load the LLM API client
-        api_url = os.getenv("PHI3_BASE_MODEL_URL")
-        api_token = os.getenv("BASE_MODEL_API_KEY")
+        api_url = "https://Phi-3-mini-128k-instruct-tvfug.eastus2.models.ai.azure.com/chat/completions"
+        api_token = "abYSMnAW49drVbueZn8ipE9XOqcI3jyP"
         self.llm_talker = LlmApiClient(api_url, api_token)
 
     def create_chat_history(self, conversation_id: str) -> str:

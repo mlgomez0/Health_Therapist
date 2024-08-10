@@ -33,9 +33,9 @@ class PromptTemplate:
         setting up the attributes for embedding name, Chroma database path, 
         collection name, and similarity searcher.
         """
-        self.embedding_name = os.getenv('EMBEDDING_NAME')
-        self.chromadb_path = os.getenv('PERSIST_DIRECTORY')
-        self.collection_name = os.getenv('COLLECTION_NAME')
+        self.embedding_name = "sentence-transformers/all-MiniLM-L6-v2"
+        self.chromadb_path = "chroma_db"
+        self.collection_name = "mental_health_chats"
 
         print(f"Embedding Name: {self.embedding_name}")
         print(f"Chroma DB Path: {self.chromadb_path}")

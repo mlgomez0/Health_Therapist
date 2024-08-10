@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState } from 'react';
+import { getApiUrl } from '@/utils/shared';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import './Register.css';
 
 const Register: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [ username, setUsername ] = useState('');
+  const [ email, setEmail ] = useState('');
+  const [ password, setPassword ] = useState('');
+  const [ confirmPassword, setConfirmPassword ] = useState('');
+  const [ message, setMessage ] = useState('');
   const router = useRouter();
 
   const handleRegister = async (event: React.FormEvent) => {
@@ -21,7 +22,7 @@ const Register: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/register', { username, email, password });
+      const response = await axios.post(`${getApiUrl()}/api/register`, { username, email, password });
       setMessage(response.data.message);
       if (response.data.message === "Registration successful") {
         window.location.href = '/login'; // Navigate to login page on successful registration

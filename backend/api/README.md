@@ -45,7 +45,7 @@ Windows
 $env:HF_API="XXXX"
 $env:EMBEDDING_NAME="sentence-transformers/all-MiniLM-L6-v2"
 $env:DATASET_PATH="backend/ml_models/datasets/dataset.csv"
-$env:PERSIST_DIRECTORY="backend/api/chroma_db"
+$env:PERSIST_DIRECTORY="chroma_db"
 $env:CHROMA_DB_DIR="chroma_db"
 $env:COLLECTION_NAME="mental_health_chats"
 $env:PHI3_MODEL_NAME="microsoft/Phi-3-mini-4k-instruct"
@@ -100,22 +100,22 @@ Content-Type: application/json
 
 1. Create a Docker image
     ```bash
-    docker build -t "captone-project-term3" . --tag=captone-project-term3:1.0.0
+    docker build -t "captone-project-api" . --tag=captone-project-api:1.0.4
     ```
 
 2. Create a container. The parameter -p has the format hostport:dockerport
     ```bash
-    docker create --name=captone-project-term3 -p 5000:5000 captone-project-term3:1.0.0
+    docker create --name=captone-project-api -p 5000:5000 captone-project-api:1.0.4
     ```
 
 3. Create a tag. You can change the version as needed
     ```bash
-    docker tag captone-project-term3:1.0.0 dockername.azurecr.io/captone-project-term3:1.0.0
+    docker tag captone-project-api:1.0.4 dockerioip.azurecr.io/captone-project-api:1.0.4
     ```
 4. Push the image to Azure Container Registry
     ```bash
-    az acr login --name dockername
-    docker push dockername.azurecr.io/captone-project-term3:1.0.0
+    az acr login --name dockerioip.azurecr.io
+    docker push dockerioip.azurecr.io/captone-project-api:1.0.4
     ```
 
 

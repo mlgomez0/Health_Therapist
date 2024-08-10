@@ -34,6 +34,7 @@ class LlmApiClient:
         }
 
         print(Fore.YELLOW + f"____________________Payload_________________________")
+        print(Fore.YELLOW + self.phi3_model_url)
         print(Fore.YELLOW + json.dumps(payload, indent=4))
         print(Fore.WHITE + f"_____________________________________________________")
 

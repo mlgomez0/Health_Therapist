@@ -41,7 +41,7 @@ rag = Rag()
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000",
+    "https://capstone-project-front-azfwc0gkdua0gpbr.eastus2-01.azurewebsites.net"
 ]
 
 app.add_middleware(

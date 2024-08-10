@@ -1,10 +1,7 @@
 from .rag_modules.LlmApiClient import LlmApiClient
 from .infraestructure.ConversationRepository import ConversationRepository
 from .infraestructure.DbContext import DbContext
-from colorama import Fore, init
-from huggingface_hub import login
-from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from colorama import Fore
 import os
 import torch
 
@@ -13,11 +10,6 @@ class Phi3():
     def __init__(self) -> None:
 
         self.db = ConversationRepository(DbContext())
-
-        self.use_local = torch.cuda.is_available()
-        self.use_local = False
-        if self.use_local:
-            self.inititalize_local()
         self.initialize_remote()
 
         # Instructions
@@ -38,34 +30,7 @@ class Phi3():
         messages = self.create_context(conversation_id, user_input)
 
         # Generate response
-        generated_text = ""
-        if self.use_local:
-
-            # Create prompt with context
-            prompt_with_context = self.pipe.tokenizer.apply_chat_template(messages, tokenize=False)
-
-            # Generate response using the model locally
-            outputs = self.pipe(
-                prompt_with_context,
-                max_new_tokens=500,
-                do_sample=True,
-                num_beams=1,
-                temperature=0.3,
-                top_k=50,
-                top_p=0.95,
-                max_time= 600
-            )
-            generated_text = outputs[0]['generated_text'][len(prompt_with_context):].strip()
-
-            # Remove the text after the word "(Note:"
-            generated_text = generated_text.split("(Note:")[0].strip()
-
-            # Remove the text after the word "Note:", "\n\n"
-            generated_text = generated_text.split("Note:")[0].strip()
-            generated_text = generated_text.split("\n\n")[0].strip()
-
-        else:
-            generated_text = self.api_client.predict(messages)
+        generated_text = self.api_client.predict(messages)
 
         # Create the summary of the conversation
         #summary = self.create_summary(messages[1:])
@@ -103,35 +68,12 @@ class Phi3():
 
         return history
 
-    def inititalize_local(self):
-
-        token = os.getenv("HF_API_TOKEN")
-        login(token=token)
-        print(Fore.CYAN + f"TOKEN={token}")
-
-        # Settings
-        model_name = 'acorreal/phi3-mental-health'
-        adapter_name = 'acorreal/adapter-phi-3-mini-mental-health'
-        compute_dtype = torch.bfloat16
-
-        # Load model
-        model = AutoModelForCausalLM.from_pretrained(model_name, trust_remote_code=True, torch_dtype=compute_dtype)
-        model = PeftModel.from_pretrained(model, adapter_name)
-        model = model.merge_and_unload()
-        print(Fore.MAGENTA + 'Model loaded')
-
-        # Load tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(adapter_name)
-        print(Fore.MAGENTA + 'Tokenizer loaded')
-
-        self.pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
-
     def initialize_remote(self):
         """
         Initialize the API client to interact with the fine-tuned model deployed on the cloud.
         """
-        api_url = os.getenv("FINE_TUNED_MODEL_URL")
-        api_token = os.getenv("FINE_TUNED_MODEL_API_KEY")
+        api_url = "https://Phi-3-mini-128k-instruct-tvfug.eastus2.models.ai.azure.com/chat/completions"
+        api_token = "abYSMnAW49drVbueZn8ipE9XOqcI3jyP"
         self.api_client = LlmApiClient(api_url, api_token)
 
     def create_summary(self, messages: list) -> str:

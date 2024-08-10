@@ -2,31 +2,32 @@
 
 import { IConversation } from '@/types/IConversation';
 import { formatDate } from '@/utils/formatDate';
+import { getApiUrl } from '@/utils/shared';
 import { Menu, MenuButton, MenuItem } from '@szhsin/react-menu';
 import '@szhsin/react-menu/dist/index.css';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
-import './Chatbot.css';
 import FeedbackForm from '../FeedbackForm';
 import Modal from '../Modal';
+import './Chatbot.css';
 
-const apiUrl = 'http://127.0.0.1:5000'; // Ensure this matches FastAPI URL
+const apiUrl = getApiUrl();
 
 const Chatbot: React.FC = () => {
-    const [messages, setMessages] = useState<IMessage[]>([]);
-    const [inputValue, setInputValue] = useState('');
+    const [ messages, setMessages ] = useState<IMessage[]>([]);
+    const [ inputValue, setInputValue ] = useState('');
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [selectedModel, setSelectedModel] = useState<'fine-tuned' | 'rag'>('fine-tuned');
-    const [conversationId, setConversationId] = useState(0);
-    const [history, setHistory] = useState<IConversation[]>([]);
-    const [showFeedbackForm, setShowFeedbackForm] = useState(false);
-    const [showThankYou, setShowThankYou] = useState(false);
+    const [ isLoading, setIsLoading ] = useState(false);
+    const [ selectedModel, setSelectedModel ] = useState<'fine-tuned' | 'rag'>('fine-tuned');
+    const [ conversationId, setConversationId ] = useState(0);
+    const [ history, setHistory ] = useState<IConversation[]>([]);
+    const [ showFeedbackForm, setShowFeedbackForm ] = useState(false);
+    const [ showThankYou, setShowThankYou ] = useState(false);
     const router = useRouter(); // For navigation
 
-    const [username, setUsername] = useState<string>('');
-    const [userId, setUserId] = useState<string | null>(null);
+    const [ username, setUsername ] = useState<string>('');
+    const [ userId, setUserId ] = useState<string | null>(null);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -37,7 +38,7 @@ const Chatbot: React.FC = () => {
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    }, [ messages ]);
 
     useEffect(() => {
         const loadConversations = async () => {
@@ -55,7 +56,7 @@ const Chatbot: React.FC = () => {
         if (userId) {
             loadConversations();
         }
-    }, [userId]);
+    }, [ userId ]);
 
     const fetchConversationDetails = async (conversationId: number) => {
         try {
@@ -64,7 +65,7 @@ const Chatbot: React.FC = () => {
                 throw new Error(`Error fetching conversation details: ${response.statusText}`);
             }
             const data = await response.json();
-            
+
             const newMessages: IMessage[] = [];
             data.messages.forEach((x: any) => {
                 newMessages.push({ text: x.user_message, sender: 'user' });
@@ -85,40 +86,40 @@ const Chatbot: React.FC = () => {
             sender: 'user',
         };
 
-        setMessages([...messages, newMessage]);
+        setMessages([ ...messages, newMessage ]);
         setInputValue('');
         setIsLoading(true);
 
         fetch(`${apiUrl}/api/chat`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-user-id': userId},
+            headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
             body: JSON.stringify({
                 model: selectedModel,
                 text: inputValue,
                 conversation_id: conversationId,
-                user_id: userId  
+                user_id: userId
             })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error sending message: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            const botMessage: IMessage = {
-                text: data.text,
-                sender: 'bot',
-            };
-            setMessages(prevMessages => [...prevMessages, botMessage]);
-            setConversationId(data.conversation_id);
-        })
-        .catch(error => {
-            console.error("Error sending message:", error);
-        })
-        .finally(() => {
-            setIsLoading(false);
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Error sending message: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const botMessage: IMessage = {
+                    text: data.text,
+                    sender: 'bot',
+                };
+                setMessages(prevMessages => [ ...prevMessages, botMessage ]);
+                setConversationId(data.conversation_id);
+            })
+            .catch(error => {
+                console.error("Error sending message:", error);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,9 +133,9 @@ const Chatbot: React.FC = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('username'); 
-        localStorage.removeItem('user_id'); 
-        router.push('/login'); 
+        localStorage.removeItem('username');
+        localStorage.removeItem('user_id');
+        router.push('/login');
     };
 
     const handleNewChat = () => {
@@ -147,10 +148,10 @@ const Chatbot: React.FC = () => {
         setShowFeedbackForm(true);
     };
 
-    const handleSubmitFeedback = async (feedbackData: { rating: number; comment: string }) => {
+    const handleSubmitFeedback = async () => {
         setShowFeedbackForm(false);
         setShowThankYou(true);
-        setTimeout(() => setShowThankYou(false), 3000); 
+        setTimeout(() => setShowThankYou(false), 3000);
     };
 
     return (
