@@ -28,6 +28,14 @@ class ConversationRepository:
         '''
         self.db.execute_non_query(sql, (summary, conversation_id))
 
+    def update_feedback(self, conversation_id: int, user_score: int, user_feedback: str):
+        sql = '''
+            UPDATE conversations
+            SET user_score = ?, user_feedback = ?
+            WHERE id = ?
+        '''
+        self.db.execute_non_query(sql, (user_score, user_feedback, conversation_id))
+
     def get_conversations(self, user_id: int) -> List[dict]:
         sql = '''
             SELECT id, user_id, model_name, summary, timestamp
@@ -86,5 +94,3 @@ class ConversationRepository:
                 for message in messages
             ]
         }
-
-

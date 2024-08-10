@@ -1,10 +1,9 @@
 import sqlite3
-from typing import Any, List, Tuple
-from colorama import Fore, init
+from typing import Any, Tuple
+from colorama import Fore
 import os
 
 class DbContext:
-
     def __init__(self):
         self.db_name = 'chat_data.db'
         # If the database does not exist, create it
@@ -59,6 +58,22 @@ class DbContext:
         '''
         self.execute_non_query(sql, ())
         print(Fore.MAGENTA + 'Messages table created')
+
+        # Create feedback table
+        sql = '''
+            CREATE TABLE IF NOT EXISTS feedback (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                conversation_id INTEGER NOT NULL,
+                feedback TEXT,
+                rating INTEGER,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users (id),
+                CONSTRAINT fk_conversation_id FOREIGN KEY (conversation_id) REFERENCES conversations (id)
+            )
+        '''
+        self.execute_non_query(sql, ())
+        print(Fore.MAGENTA + 'Feedback table created')
 
     def execute_non_query(self, sql: str, params: Tuple[Any]):
         with self.connect() as conn:

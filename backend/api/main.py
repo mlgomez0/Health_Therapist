@@ -1,18 +1,30 @@
 from colorama import Fore, init
-from fastapi import FastAPI, HTTPException, APIRouter  # Ensure Request is imported
+from fastapi import FastAPI, HTTPException, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from src.request import LlmRequest
 from src.infraestructure.ConversationRepository import ConversationRepository
 from src.infraestructure.DbContext import DbContext
 from src.infraestructure.UserRepository import UserRepository
 from src.Phi3 import Phi3
 from src.Rag import Rag
-from src.request import Request
-from typing import List
 import logging
 import os
 import sys
-import torch
+
+class UserRegister(BaseModel):
+    username: str
+    password: str
+    email: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class Feedback(BaseModel):
+    conversation_id: int
+    user_score: int
+    user_feedback: str
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,12 +41,8 @@ rag = Rag()
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000",  # React frontend
+    "http://localhost:3000",
 ]
-# Create an instance of the ConversationRepository class
-conversation_repository = ConversationRepository(DbContext())
-user_repository = UserRepository(DbContext())
-print(Fore.MAGENTA + "Database connected")
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,19 +52,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Create an instance of the ConversationRepository class
 conversation_repository = ConversationRepository(DbContext())
+user_repository = UserRepository(DbContext())
+print(Fore.MAGENTA + "Database connected")
 
 # Register router
 router = APIRouter()
-
-class UserRegister(BaseModel):
-    username: str
-    password: str
-    email: str
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
 
 db_context = DbContext()
 user_repository = UserRepository(db_context)
@@ -72,16 +74,16 @@ async def register_user(user: UserRegister):
 
 @router.post("/api/login")
 async def login_user(user: UserLogin):
-    
     logging.info(f"Login attempt for username: {user.username}")
     existing_user = user_repository.get_user_by_username(user.username)
-    
-    if existing_user == None or existing_user['password'] != user.password:  # Ensure the index is correct for password
+    logging.info(f"Existing user: {existing_user}")
+
+    if not existing_user or existing_user['password'] != user.password:
         logging.error("Invalid username or password")
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     logging.info("Login successful")
-    return {"message": "Login successful"}
+    return {"message": "Login successful", "user_id": existing_user['id']}
 
 app.include_router(router)
 
@@ -105,22 +107,29 @@ def clear_history():
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 @app.get("/api/history")
-async def get_history():
-    user_id = 1  # Assuming a single user for simplicity
-    result = conversation_repository.get_conversations(user_id)
+async def get_history(request: Request):
+    user_id = request.headers.get('x-user-id')
+    print("Hello",user_id)
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID header is required")
+    
+    result = conversation_repository.get_conversations(int(user_id))
     return result
 
-@app.post("/api/chat")
-async def chat(request: Request):  # Ensure request is of type Request
 
-    user_id = 1
+@app.post("/api/chat")
+async def chat(request: LlmRequest, http_request: Request):
+    user_id = http_request.headers.get('x-user-id')
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID header is required")
+    
     conversation_id = request.conversation_id
     model = request.model
     text = request.text
-    
+
     if conversation_id <= 0:
         print(Fore.RED + "Creating new conversation")
-        conversation_id = conversation_repository.create_conversation(user_id, model)
+        conversation_id = conversation_repository.create_conversation(int(user_id), model)
         print(Fore.GREEN + f"New conversation ID: {conversation_id}")
 
     response = ""
@@ -157,45 +166,19 @@ def get_conversation(conversation_id: int):
         logging.error(f"Error in /api/conversation/{conversation_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
+@app.post("/api/feedback")
+async def submit_feedback(feedback: Feedback, request: Request):
+    username = request.headers.get('x-username')
+    if not username:
+        raise HTTPException(status_code=400, detail="Username header is required")
+    
+    user = user_repository.get_user_by_username(username)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    conversation_repository.update_feedback(feedback.conversation_id, feedback.user_score, feedback.user_feedback)
+    return {"message": "Feedback submitted successfully"}
+
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run(app, host='127.0.0.1', port=5000)
-
-@app.get("/api/history")
-def get_conversations():
-    """
-    Returns the conversations history
-    """
-    user_id = 1
-    result = conversation_repository.get_conversations(user_id)
-    return result
-
-# User management API models and endpoints
-class User(BaseModel):
-    username: str
-    password: str
-
-@app.post("/users/")
-def create_user(user: User):
-    user_id = user_repository.insert_user(user.username, user.password)
-    if user_id:
-        return {"id": user_id, "username": user.username}
-    else:
-        raise HTTPException(status_code=400, detail="User creation failed")
-
-@app.put("/users/{user_id}")
-def update_user(user_id: int, user: User):
-    rows_affected = user_repository.update_user(user_id, user.username, user.password)
-    if rows_affected:
-        return {"message": "User updated successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="User not found")
-
-@app.delete("/users/{user_id}")
-def delete_user(user_id: int):
-    rows_affected = user_repository.delete_user(user_id)
-    if rows_affected:
-        return {"message": "User deleted successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="User not found")
-

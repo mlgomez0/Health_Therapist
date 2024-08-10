@@ -22,6 +22,7 @@ class UserRepository:
             SELECT * FROM users WHERE username = ? OR email = ?
         '''
         return self.db.query_one(sql, (username, email))
+
     def get_user_by_username(self, username: str):
         sql = '''
             SELECT id, username, password, email FROM users WHERE username = ?
@@ -82,3 +83,9 @@ class UserRepository:
             DELETE FROM users WHERE id = ?
         '''
         return self.db.execute_non_query(sql, (user_id,))
+    
+    def submit_feedback(self, user_id: int, conversation_id: int, feedback: str, rating: int):
+        sql = '''
+            INSERT INTO feedback (user_id, conversation_id, feedback, rating) VALUES (?, ?, ?, ?)
+        '''
+        return self.db.insert(sql, (user_id, conversation_id, feedback, rating))

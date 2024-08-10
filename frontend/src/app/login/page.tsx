@@ -124,7 +124,7 @@ const ForgotPasswordLink = styled.a`
   }
 `;
 
-const SocialButton = styled.button`
+const SocialButton = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -134,11 +134,26 @@ const SocialButton = styled.button`
   border: none;
   background: none;
   cursor: pointer;
+  font-size: 20px;
+  color: #fff;
+  border-radius: 50%;
+  text-decoration: none;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
-const SocialIcon = styled.img`
-  width: 40px;
-  height: 40px;
+const FacebookButton = styled(SocialButton)`
+  background-color: #3b5998;
+`;
+
+const GoogleButton = styled(SocialButton)`
+  background-color: #db4437;
+`;
+
+const LinkedInButton = styled(SocialButton)`
+  background-color: #0077b5;
 `;
 
 const SocialContainer = styled.div`
@@ -210,12 +225,14 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         setMessage('Login successful');
+        const { user_id } = response.data;
         localStorage.setItem('username', username); // Save username to localStorage
-        router.push('/'); // Navigate to the home page on successful login
+        localStorage.setItem('user_id', user_id); // Save user_id to localStorage
+        router.push('/chat'); // Navigate to the home page on successful login
       } else {
         setMessage(response.data.detail || 'Invalid username or password');
       }
-    } catch (error: any) {
+    } catch (error) {
       if (axios.isAxiosError(error) && error.response && error.response.data && error.response.data.detail) {
         setMessage(error.response.data.detail);
       } else {
@@ -234,17 +251,11 @@ const LoginPage = () => {
           <FormSide>
             <Form onSubmit={handleLogin}>
               <h2>Login</h2>
-              <SocialContainer>
-                <SocialButton>
-                  <SocialIcon src="/images/facebook.png" alt="Facebook" />
-                </SocialButton>
-                <SocialButton>
-                  <SocialIcon src="/images/google.png" alt="Google" />
-                </SocialButton>
-                <SocialButton>
-                  <SocialIcon src="/images/linkedin.png" alt="LinkedIn" />
-                </SocialButton>
-              </SocialContainer>
+              {/* <SocialContainer>
+                <FacebookButton href="https://www.facebook.com/login" target="_blank" rel="noopener noreferrer">f</FacebookButton>
+                <GoogleButton href="https://accounts.google.com/signin" target="_blank" rel="noopener noreferrer">G+</GoogleButton>
+                <LinkedInButton href="https://www.linkedin.com/login" target="_blank" rel="noopener noreferrer">in</LinkedInButton>
+              </SocialContainer> */}
               <p>or use your username to login:</p>
               <InputWrapper>
                 <Input
@@ -267,9 +278,9 @@ const LoginPage = () => {
                   required
                 />
               </InputWrapper>
-              <ForgotPasswordLink href="/forgot-password">Forgot password?</ForgotPasswordLink>
+              {/*<ForgotPasswordLink href="/forgot-password">Forgot password?</ForgotPasswordLink>*/}
               <Button type="submit">Login</Button>
-              {message && <p>{typeof message === 'string' ? message : 'An error occurred'}</p>}
+              {message && <p>{message}</p>}
               <RegisterContainer>
                 <RegisterText>Not on Mind2Heart yet?</RegisterText>
                 <RegisterLink href="/register">Create new account</RegisterLink>
